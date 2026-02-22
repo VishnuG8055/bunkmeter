@@ -573,7 +573,7 @@ function showRes(proj,aff,mode,dates,bset){
 }
 
 /* ─── LOG ─── */
-function initLogDate(){const el=document.getElementById('log-date');el.max=today();el.value=today();}
+function initLogDate(){const el=document.getElementById('log-date');el.max=today(); el.min='2026-01-01'; el.value=today();}
 
 function loadLog(){
   const ds=document.getElementById('log-date').value;
