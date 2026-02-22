@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>BunkMeter</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root {
+  --bg:#08080b; --s1:#0f0f14; --s2:#161620; --s3:#1e1e2a; --s4:#252533;
+  --bd:#2a2a3c; --bd2:#383850;
+  --tx:#ededf5; --tx2:#9898b8; --tx3:#55556e;
+  --g:#22d473; --gbg:rgba(34,212,115,.09); --gbd:rgba(34,212,115,.22);
+  --y:#f5c518; --ybg:rgba(245,197,24,.09); --ybd:rgba(245,197,24,.22);
+  --o:#f97316; --obg:rgba(249,115,22,.09); --obd:rgba(249,115,22,.22);
+  --r:#f04444; --rbg:rgba(240,68,68,.09); --rbd:rgba(240,68,68,.22);
+  --b:#4f8ef7; --bbg:rgba(79,142,247,.09); --bbd:rgba(79,142,247,.22);
+  --p:#a78bfa; --pbg:rgba(167,139,250,.09); --pbd:rgba(167,139,250,.22);
+  --rad:10px; --rad-s:6px; --rad-xs:4px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--tx);min-height:100dvh;-webkit-font-smoothing:antialiased;overscroll-behavior:none}
+.mono{font-family:'JetBrains Mono',monospace}
+::-webkit-scrollbar{width:3px;height:3px}
+::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:2px}
+.app{display:flex;flex-direction:column;min-height:100dvh}
+
+/* HEADER */
+.hdr{position:sticky;top:0;z-index:300;height:52px;padding:0 1rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;background:rgba(8,8,11,.95);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-bottom:1px solid var(--bd)}
+.logo{font-size:1.05rem;font-weight:800;letter-spacing:-.04em}
+.logo em{color:var(--p);font-style:normal}
+.sync{display:flex;align-items:center;gap:.35rem;font-size:.68rem;color:var(--tx3)}
+.dot{width:5px;height:5px;border-radius:50%;background:var(--tx3);flex-shrink:0;transition:background .3s}
+.dot.ok{background:var(--g)}.dot.err{background:var(--r)}.dot.load{background:var(--y)}
+
+/* NAV */
+.nav{display:flex;overflow-x:auto;scrollbar-width:none;background:var(--s1);border-bottom:1px solid var(--bd);position:sticky;top:52px;z-index:200}
+.nav::-webkit-scrollbar{display:none}
+.nb{flex-shrink:0;height:42px;padding:0 1.05rem;border:none;background:transparent;color:var(--tx3);font-family:'Outfit',sans-serif;font-size:.79rem;font-weight:600;cursor:pointer;border-bottom:2px solid transparent;transition:color .18s,border-color .18s;white-space:nowrap}
+.nb.on{color:var(--tx);border-bottom-color:var(--p)}
+.nb:hover:not(.on){color:var(--tx2)}
+
+/* PAGES */
+.pg{display:none;padding:1.1rem 1rem;max-width:860px;margin:0 auto;width:100%}
+.pg.on{display:block}
+
+/* PRIMITIVES */
+.sec{font-size:.63rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--tx3);margin-bottom:.7rem}
+.card{background:var(--s1);border:1px solid var(--bd);border-radius:var(--rad);padding:1rem}
+.divider{height:1px;background:var(--bd);margin:1rem 0}
+.empty{text-align:center;padding:2.5rem 1rem;color:var(--tx3);font-size:.85rem;line-height:1.7}
+
+/* FORM */
+.fg{display:flex;flex-direction:column;gap:.32rem}
+.fl{font-size:.65rem;font-weight:700;letter-spacing:.06em;color:var(--tx3);text-transform:uppercase}
+input[type="date"],select{background:var(--s2);border:1px solid var(--bd);color:var(--tx);padding:.52rem .7rem;border-radius:var(--rad-s);font-family:'Outfit',sans-serif;font-size:.84rem;outline:none;width:100%;transition:border-color .18s;-webkit-appearance:none;appearance:none}
+input[type="date"]:focus,select:focus{border-color:var(--p)}
+option{background:var(--s2)}
+.frow{display:flex;gap:.5rem;align-items:flex-end;flex-wrap:wrap}
+
+/* BUTTONS */
+.btn{padding:.52rem .95rem;border:none;border-radius:var(--rad-s);font-family:'Outfit',sans-serif;font-weight:700;font-size:.81rem;cursor:pointer;transition:opacity .15s,transform .1s;white-space:nowrap}
+.btn:active{transform:scale(.97)}
+.btn-p{background:var(--p);color:#000}.btn-p:hover{opacity:.85}
+.btn-s{background:var(--s3);color:var(--tx);border:1px solid var(--bd)}.btn-s:hover{border-color:var(--bd2)}
+.btn-d{background:var(--rbg);color:var(--r);border:1px solid var(--rbd)}
+.btn-sm{padding:.32rem .65rem;font-size:.7rem}
+.btn-full{width:100%}
+
+/* TAGS */
+.tag{font-size:.62rem;font-weight:700;padding:.17rem .48rem;border-radius:var(--rad-xs);white-space:nowrap;display:inline-block}
+.tg{background:var(--gbg);color:var(--g);border:1px solid var(--gbd)}
+.ty{background:var(--ybg);color:var(--y);border:1px solid var(--ybd)}
+.to{background:var(--obg);color:var(--o);border:1px solid var(--obd)}
+.tr_{background:var(--rbg);color:var(--r);border:1px solid var(--rbd)}
+.tb_{background:var(--bbg);color:var(--b);border:1px solid var(--bbd)}
+.tp{background:var(--pbg);color:var(--p);border:1px solid var(--pbd)}
+
+/* BARS */
+.btrack{background:var(--s3);border-radius:100px;overflow:hidden}
+.bfill{height:100%;border-radius:100px;transition:width .6s cubic-bezier(.4,0,.2,1)}
+
+/* TOAST */
+.toast{position:fixed;bottom:1.2rem;left:50%;transform:translateX(-50%) translateY(60px);background:var(--s2);border:1px solid var(--bd2);border-radius:50px;padding:.55rem 1.15rem;font-size:.78rem;font-weight:600;color:var(--tx);z-index:999;opacity:0;transition:transform .28s cubic-bezier(.34,1.56,.64,1),opacity .28s;white-space:nowrap;pointer-events:none;box-shadow:0 8px 32px rgba(0,0,0,.5)}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+.toast.tg{color:var(--g);border-color:var(--gbd)}
+.toast.tr{color:var(--r);border-color:var(--rbd)}
+
+/* ═══ OVERVIEW ═══ */
+.ov-hero{background:var(--s1);border:1px solid var(--bd);border-radius:var(--rad);padding:1.1rem 1.15rem;margin-bottom:.85rem}
+.ov-row{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;margin-bottom:.85rem}
+.ov-lbl{font-size:.65rem;color:var(--tx2);font-weight:600;margin-bottom:.2rem;text-transform:uppercase;letter-spacing:.06em}
+.ov-pct{font-family:'JetBrains Mono',monospace;font-size:2.3rem;font-weight:500;line-height:1}
+.ov-sub{font-size:.68rem;color:var(--tx3);margin-top:.22rem}
+.ov-bar-wrap{flex:1;padding-top:.45rem}
+.ov-markers{display:flex;justify-content:space-between;font-size:.58rem;color:var(--tx3);margin-top:.28rem}
+
+.sg{display:grid;grid-template-columns:repeat(4,1fr);gap:.45rem;margin-bottom:.9rem}
+@media(max-width:400px){.sg{grid-template-columns:repeat(2,1fr)}}
+.sc{background:var(--s1);border:1px solid var(--bd);border-radius:var(--rad);padding:.7rem;text-align:center}
+.scv{font-family:'JetBrains Mono',monospace;font-size:1.35rem;font-weight:500;line-height:1;margin-bottom:.2rem}
+.scl{font-size:.6rem;color:var(--tx3);font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+
+.sj-list{display:flex;flex-direction:column;gap:.45rem}
+.sj{background:var(--s1);border:1px solid var(--bd);border-radius:var(--rad);padding:.82rem 1rem;transition:border-color .18s}
+.sj:hover{border-color:var(--bd2)}
+.sj-top{display:flex;align-items:flex-start;justify-content:space-between;gap:.5rem;margin-bottom:.5rem}
+.sj-meta{flex:1;min-width:0}
+.sj-code{font-family:'JetBrains Mono',monospace;font-size:.58rem;color:var(--tx3);margin-bottom:.12rem}
+.sj-name{font-size:.86rem;font-weight:700;line-height:1.3}
+.sj-r{display:flex;flex-direction:column;align-items:flex-end;gap:.22rem;flex-shrink:0}
+.sj-pct{font-family:'JetBrains Mono',monospace;font-size:1.2rem;font-weight:500;line-height:1}
+.sj-cnt{font-size:.65rem;color:var(--tx3);font-family:'JetBrains Mono',monospace}
+.sj-bunks{display:flex;gap:.3rem;flex-wrap:wrap;margin-top:.45rem}
+
+/* ═══ ESTIMATOR ═══ */
+.mode-row{display:flex;gap:.4rem;margin-bottom:.9rem}
+.mbtn{flex:1;padding:.5rem;border:1px solid var(--bd);border-radius:var(--rad-s);background:var(--s2);color:var(--tx2);font-family:'Outfit',sans-serif;font-size:.77rem;font-weight:600;cursor:pointer;transition:all .18s;text-align:center}
+.mbtn.on{background:var(--pbg);border-color:var(--pbd);color:var(--p)}
+.est-panel{background:var(--s1);border:1px solid var(--bd);border-radius:var(--rad);padding:1rem;margin-bottom:.7rem}
+.chip{display:flex;align-items:center;gap:.5rem;background:var(--s2);border:1px solid var(--bd);border-radius:var(--rad-s);padding:.48rem .7rem;margin-bottom:.38rem}
+.chip-info{flex:1;min-width:0}
+.chip-date{font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--p);margin-bottom:.08rem}
+.chip-name{font-size:.8rem;font-weight:600}
+.chip-sub{font-size:.62rem;color:var(--tx3)}
+.est-overall{background:var(--s1);border:1px solid var(--bd);border-radius:var(--rad);padding:.9rem 1.1rem;margin-bottom:.7rem;display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+.eol-lbl{font-size:.63rem;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.22rem}
+.eol-val{font-family:'JetBrains Mono',monospace;font-size:1.55rem}
+.eol-sub{font-size:.68rem;color:var(--tx3);margin-top:.18rem}
+.eor{display:flex;gap:.4rem;flex-wrap:wrap;padding-top:.25rem}
+.esr-list{display:flex;flex-direction:column;gap:.38rem}
+.esr{background:var(--s1);border:1px solid var(--bd);border-radius:var(--rad-s);padding:.65rem .9rem;display:flex;align-items:center;justify-content:space-between;gap:.6rem;flex-wrap:wrap}
+.esr-l{flex:1;min-width:110px}
+.esr-code{font-family:'JetBrains Mono',monospace;font-size:.58rem;color:var(--tx3)}
+.esr-name{font-size:.81rem;font-weight:600}
+.esr-r{display:flex;align-items:center;gap:.5rem;flex-shrink:0}
+.esr-old{font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--tx3);text-decoration:line-through}
+.esr-new{font-family:'JetBrains Mono',monospace;font-size:1rem;font-weight:500}
+
+/* ═══ LOG ═══ */
+.log-ctrl{background:var(--s1);border:1px solid var(--bd);border-radius:var(--rad);padding:.9rem 1rem;margin-bottom:.7rem}
+.log-card{background:var(--s1);border:1px solid var(--bd);border-radius:var(--rad);overflow:hidden;margin-bottom:.7rem}
+.log-card-hdr{padding:.65rem 1rem;border-bottom:1px solid var(--bd);background:var(--s2);display:flex;align-items:center;justify-content:space-between}
+.lcd{font-family:'JetBrains Mono',monospace;font-size:.78rem;font-weight:500}
+.lcm{font-size:.68rem;color:var(--tx3)}
+.lp{display:flex;align-items:center;justify-content:space-between;padding:.6rem 1rem;border-bottom:1px solid var(--bd);gap:.7rem}
+.lp:last-of-type{border-bottom:none}
+.lp-info{flex:1;min-width:0}
+.lp-time{font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--tx3);margin-bottom:.1rem}
+.lp-name{font-size:.82rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lp-code{font-family:'JetBrains Mono',monospace;font-size:.58rem;color:var(--tx3)}
+.tog{display:flex;border:1px solid var(--bd);border-radius:var(--rad-s);overflow:hidden;flex-shrink:0}
+.tb{padding:.3rem .65rem;border:none;background:transparent;font-family:'Outfit',sans-serif;font-size:.72rem;font-weight:700;cursor:pointer;transition:background .15s,color .15s;color:var(--tx3)}
+.tb.pa{background:var(--gbg);color:var(--g)}
+.tb.aa{background:var(--rbg);color:var(--r)}
+.log-save-bar{padding:.7rem 1rem;border-top:1px solid var(--bd)}
+.hist-item{display:flex;align-items:center;justify-content:space-between;background:var(--s1);border:1px solid var(--bd);border-radius:var(--rad);padding:.7rem 1rem;margin-bottom:.38rem;gap:.7rem}
+.hi-date{font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--p);font-weight:500;margin-bottom:.12rem}
+.hi-sum{font-size:.73rem;color:var(--tx2)}
+.hi-acts{display:flex;gap:.32rem;flex-shrink:0}
+
+/* ═══ CALENDAR ═══ */
+.cal-mhdr{font-weight:800;font-size:.93rem;margin-bottom:.6rem;margin-top:.2rem}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:1.15rem}
+.ch{text-align:center;font-size:.58rem;font-weight:700;color:var(--tx3);padding:.32rem 0}
+.cc{border-radius:5px;border:1px solid transparent;padding:.28rem .15rem;display:flex;flex-direction:column;align-items:center;font-size:.7rem;font-weight:600;min-height:50px;background:var(--s1);color:var(--tx2)}
+.cc.emp{background:transparent;border-color:transparent}
+.cc.wknd{opacity:.28}
+.cc.hol{background:var(--rbg);border-color:var(--rbd);color:var(--r)}
+.cc.logged{background:var(--gbg);border-color:var(--gbd);color:var(--g)}
+.cc.today{border-color:var(--p);color:var(--tx)}
+.cc.past:not(.logged):not(.hol):not(.wknd){opacity:.42}
+.ccn{font-family:'JetBrains Mono',monospace;font-size:.66rem;line-height:1;margin-bottom:1px}
+.cch{font-size:.4rem;color:var(--r);text-align:center;line-height:1.2;margin-top:1px;padding:0 1px;word-break:break-word;max-width:100%}
+.ccd{display:flex;gap:1px;flex-wrap:wrap;justify-content:center;margin-top:2px}
+.cd{width:3px;height:3px;border-radius:50%}
+.cal-legend{display:flex;gap:.85rem;flex-wrap:wrap;font-size:.68rem;color:var(--tx3);margin-top:.5rem}
+.cli{display:flex;align-items:center;gap:.3rem}
+.clb{width:8px;height:8px;border-radius:2px;border:1px solid}
+
+/* ═══ TIMETABLE ═══ */
+.tt-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:.5rem}
+.tt-legend{display:flex;gap:.6rem;margin-bottom:.75rem}
+.tt-li{font-size:.68rem;padding:.18rem .55rem;border-radius:var(--rad-xs);font-weight:700}
+.tt-table{min-width:480px;width:100%;border-collapse:separate;border-spacing:3px}
+.tt-th{font-size:.68rem;font-weight:700;color:var(--tx2);padding:.45rem .3rem;text-align:center;background:var(--s2);border-radius:var(--rad-xs)}
+.tt-time{font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--tx3);padding:.35rem .45rem;white-space:nowrap;vertical-align:middle;font-weight:500}
+.tt-c{padding:.45rem .4rem;border-radius:var(--rad-xs);vertical-align:top;text-align:center;min-width:86px}
+.tt-c.lec{background:rgba(245,197,24,.07);border:1px solid rgba(245,197,24,.14)}
+.tt-c.lab{background:rgba(79,142,247,.07);border:1px solid rgba(79,142,247,.13)}
+.tt-c.nil{background:var(--s1);border:1px solid var(--bd);opacity:.3}
+.tt-cn{font-size:.68rem;font-weight:700;line-height:1.25;color:var(--tx);margin-bottom:.18rem}
+.tt-cc{font-family:'JetBrains Mono',monospace;font-size:.55rem;color:var(--tx3)}
+</style>
+</head>
+<body>
+<div class="app">
+
+<header class="hdr">
+  <div class="logo">Bunk<em>Meter</em></div>
+  <div class="sync"><div class="dot load" id="sdot"></div><span id="slbl">connecting…</span></div>
+</header>
+
+<nav class="nav">
+  <button class="nb on" onclick="tab('overview')">Overview</button>
+  <button class="nb" onclick="tab('estimator')">Estimator</button>
+  <button class="nb" onclick="tab('log')">Log</button>
+  <button class="nb" onclick="tab('calendar')">Calendar</button>
+  <button class="nb" onclick="tab('timetable')">Timetable</button>
+</nav>
+
+<!-- OVERVIEW -->
+<div class="pg on" id="pg-overview">
+  <div id="ov-spin" style="text-align:center;padding:2rem;color:var(--tx3);font-size:.82rem">Loading…</div>
+  <div id="ov-body" style="display:none">
+    <div class="ov-hero" id="ov-hero"></div>
+    <div class="sg" id="ov-stats"></div>
+    <div class="sec">All Subjects</div>
+    <div class="sj-list" id="sj-list"></div>
+  </div>
+</div>
+
+<!-- ESTIMATOR -->
+<div class="pg" id="pg-estimator">
+  <div class="mode-row">
+    <button class="mbtn on" id="mA" onclick="setMode('attend')">Attend full day(s)</button>
+    <button class="mbtn" id="mB" onclick="setMode('bunk')">Skip specific classes</button>
+  </div>
+
+  <!-- MODE A -->
+  <div id="panelA">
+    <div class="est-panel">
+      <div class="sec" style="margin-bottom:.6rem">Pick dates — see what happens if you attend everything</div>
+      <div class="frow">
+        <div class="fg" style="flex:1"><label class="fl">Date</label><input type="date" id="ea-date" min="2025-02-23" max="2025-03-31"></div>
+        <button class="btn btn-s" onclick="addAttendDate()">+ Add</button>
+      </div>
+    </div>
+    <div id="ea-chips"></div>
+    <div id="ea-act" style="display:none;margin-bottom:.75rem">
+      <div style="display:flex;gap:.45rem">
+        <button class="btn btn-p" onclick="runAttendAll()">Estimate</button>
+        <button class="btn btn-s" onclick="clearA()">Clear</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODE B -->
+  <div id="panelB" style="display:none">
+    <div class="est-panel">
+      <div class="sec" style="margin-bottom:.6rem">Pick classes to skip — only shows subjects scheduled that day</div>
+      <div class="frow">
+        <div class="fg" style="flex:1;min-width:120px"><label class="fl">Date</label><input type="date" id="eb-date" min="2025-02-23" max="2025-03-31" onchange="refreshBSubjects()"></div>
+        <div class="fg" style="flex:1.4;min-width:130px"><label class="fl">Subject (that day)</label><select id="eb-subj"><option value="">— pick date first —</option></select></div>
+        <button class="btn btn-s" onclick="addBunkEntry()">+ Add</button>
+      </div>
+    </div>
+    <div id="eb-chips"></div>
+    <div id="eb-act" style="display:none;margin-bottom:.75rem">
+      <div style="display:flex;gap:.45rem">
+        <button class="btn btn-p" onclick="runBunkEst()">Estimate Impact</button>
+        <button class="btn btn-s" onclick="clearB()">Clear</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="est-res"></div>
+</div>
+
+<!-- LOG -->
+<div class="pg" id="pg-log">
+  <div class="log-ctrl">
+    <div class="frow">
+      <div class="fg" style="flex:1"><label class="fl">Date (today or earlier only)</label><input type="date" id="log-date"></div>
+      <button class="btn btn-p" onclick="loadLog()">Load</button>
+    </div>
+  </div>
+  <div id="log-body"></div>
+  <div style="margin-top:1.25rem">
+    <div class="sec">History</div>
+    <div id="log-hist"></div>
+  </div>
+</div>
+
+<!-- CALENDAR -->
+<div class="pg" id="pg-calendar">
+  <div id="cal-body"></div>
+  <div class="cal-legend">
+    <div class="cli"><div class="clb" style="background:var(--gbg);border-color:var(--gbd)"></div>Logged</div>
+    <div class="cli"><div class="clb" style="background:var(--rbg);border-color:var(--rbd)"></div>Holiday</div>
+    <div class="cli"><div class="clb" style="border-color:var(--p)"></div>Today</div>
+    <div class="cli"><div class="clb" style="background:var(--s1);border-color:var(--bd);opacity:.4"></div>Unlogged</div>
+  </div>
+</div>
+
+<!-- TIMETABLE -->
+<div class="pg" id="pg-timetable">
+  <div class="tt-legend">
+    <span class="tt-li" style="background:rgba(245,197,24,.07);color:var(--y);border:1px solid rgba(245,197,24,.2)">Lecture</span>
+    <span class="tt-li" style="background:rgba(79,142,247,.07);color:var(--b);border:1px solid rgba(79,142,247,.15)">Lab</span>
+  </div>
+  <div class="tt-wrap"><table class="tt-table" id="tt-tbl"></table></div>
+</div>
+
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ─── CONFIG (fill before deploy) ─── */
+const SUPABASE_URL  = 'https://dzvnihxhakcggzhqgppr.supabase.co';
+const SUPABASE_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR6dm5paHhoYWtjZ2d6aHFncHByIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3NjcwMTUsImV4cCI6MjA4NzM0MzAxNX0.E8J5QnF_VH2YX_xQLiOtSKROJ8WtvZGHI3TLTgffNwQ';
+
+/* ─── STATIC DATA ─── */
+const SUBJECTS = [
+  {code:'19ECB332',  name:'Computer Networks',          p:17,t:24,type:'lecture'},
+  {code:'19ECB332P', name:'Computer Networks Lab',      p:22,t:28,type:'lab'},
+  {code:'19ECB334',  name:'Information Security',       p:19,t:21,type:'lecture'},
+  {code:'19ECB334P', name:'Information Security Lab',   p:15,t:16,type:'lab'},
+  {code:'19ECB336',  name:'Artificial Intelligence',    p:16,t:24,type:'lecture'},
+  {code:'19ECB336P', name:'AI Lab',                     p:10,t:14,type:'lab'},
+  {code:'19ECB346',  name:'Data Mining & Analytics',    p:13,t:15,type:'lecture'},
+  {code:'19ECB346P', name:'Data Mining Lab',            p:16,t:16,type:'lab'},
+  {code:'19EHS331',  name:'Business Communication',     p:12,t:15,type:'lecture'},
+  {code:'19EHS331P', name:'Business Comm Lab',          p:12,t:16,type:'lab'},
+  {code:'19EID302',  name:'Financial & Cost Accounting',p:15,t:17,type:'lecture'},
+  {code:'24CSEN1081',name:'Intermediate Coding-II',     p:9, t:16,type:'lecture'},
+  {code:'HSMCH102',  name:'Universal Human Values 2',   p:16,t:24,type:'lecture'},
+];
+
+const TT = [
+  {day:1,slot:'08',time:'08:00–08:50',code:'19ECB334'},
+  {day:1,slot:'09',time:'09:00–09:50',code:'19ECB346'},
+  {day:1,slot:'10',time:'10:00–10:50',code:'19ECB332P'},
+  {day:1,slot:'11',time:'11:00–11:50',code:'19ECB332P'},
+  {day:1,slot:'13',time:'13:00–13:50',code:'19EHS331'},
+  {day:1,slot:'14',time:'14:00–14:50',code:'19ECB336P'},
+  {day:1,slot:'15',time:'15:00–15:50',code:'19ECB336P'},
+  {day:2,slot:'08',time:'08:00–08:50',code:'19EHS331P'},
+  {day:2,slot:'09',time:'09:00–09:50',code:'19EHS331P'},
+  {day:2,slot:'10',time:'10:00–10:50',code:'19ECB332'},
+  {day:2,slot:'11',time:'11:00–11:50',code:'19ECB336'},
+  {day:2,slot:'13',time:'13:00–13:50',code:'HSMCH102'},
+  {day:2,slot:'14',time:'14:00–14:50',code:'24CSEN1081'},
+  {day:2,slot:'15',time:'15:00–15:50',code:'24CSEN1081'},
+  {day:3,slot:'08',time:'08:00–08:50',code:'19ECB336'},
+  {day:3,slot:'09',time:'09:00–09:50',code:'19ECB332'},
+  {day:3,slot:'10',time:'10:00–10:50',code:'19ECB334P'},
+  {day:3,slot:'11',time:'11:00–11:50',code:'19ECB334P'},
+  {day:3,slot:'13',time:'13:00–13:50',code:'19EID302'},
+  {day:3,slot:'14',time:'14:00–14:50',code:'HSMCH102'},
+  {day:4,slot:'08',time:'08:00–08:50',code:'19ECB332P'},
+  {day:4,slot:'09',time:'09:00–09:50',code:'19ECB332P'},
+  {day:4,slot:'10',time:'10:00–10:50',code:'19ECB346'},
+  {day:4,slot:'11',time:'11:00–11:50',code:'19EHS331'},
+  {day:4,slot:'13',time:'13:00–13:50',code:'HSMCH102'},
+  {day:4,slot:'14',time:'14:00–14:50',code:'19ECB334'},
+  {day:5,slot:'08',time:'08:00–08:50',code:'19ECB346P'},
+  {day:5,slot:'09',time:'09:00–09:50',code:'19ECB346P'},
+  {day:5,slot:'10',time:'10:00–10:50',code:'19ECB334'},
+  {day:5,slot:'11',time:'11:00–11:50',code:'19ECB332'},
+  {day:5,slot:'13',time:'13:00–13:50',code:'19EID302'},
+  {day:5,slot:'14',time:'14:00–14:50',code:'19ECB336'},
+];
+const SLOTS = ['08','09','10','11','13','14','15'];
+const SLOT_LBL = {'08':'08:00–08:50','09':'09:00–09:50','10':'10:00–10:50','11':'11:00–11:50','13':'13:00–13:50','14':'14:00–14:50','15':'15:00–15:50'};
+const HOL = {'2025-03-20':'Ugadi / Ramzan','2025-03-27':'Sri Rama Navami'};
+
+/* ─── STATE ─── */
+let db=null, ATT={}, LOGS={};
+let estMode='attend', attendDates=[], bunkEntries=[], logState={};
+
+/* ─── HELPERS ─── */
+const pct=(p,t)=>t?(p/t)*100:0;
+const fmt=(p,t)=>pct(p,t).toFixed(2)+'%';
+const today=()=>new Date().toISOString().split('T')[0];
+const sname=c=>(SUBJECTS.find(s=>s.code===c)||{}).name||c;
+const stype=c=>(SUBJECTS.find(s=>s.code===c)||{}).type||'lecture';
+const dname=ds=>['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][new Date(ds+'T00:00:00').getDay()];
+
+function colOf(p,t){const v=pct(p,t);if(v>=80)return'g';if(v>=75)return'y';if(v>=65)return'o';return'r';}
+function colVar(p,t){return{g:'var(--g)',y:'var(--y)',o:'var(--o)',r:'var(--r)'}[colOf(p,t)];}
+function isHol(ds){if(HOL[ds])return true;const d=new Date(ds+'T00:00:00');return d.getDay()===0||d.getDay()===6;}
+function getSlots(ds){if(isHol(ds))return[];const dow=new Date(ds+'T00:00:00').getDay();return TT.filter(t=>t.day===dow);}
+function overallAtt(){let p=0,t=0;SUBJECTS.forEach(s=>{const a=ATT[s.code];if(a){p+=a.present;t+=a.total;}});return{p,t};}
+
+function canBunk(code,thr){
+  const a=ATT[code];if(!a)return 0;
+  const x=(a.present-(thr/100)*a.total)/(thr/100);
+  return Math.max(0,Math.floor(x));
+}
+function mustAtt(code){
+  const a=ATT[code];if(!a)return 0;
+  if(pct(a.present,a.total)>=75)return 0;
+  return Math.ceil(Math.max(0,(0.75*a.total-a.present)/0.25));
+}
+
+/* ─── DB ─── */
+function initATT(){SUBJECTS.forEach(s=>{ATT[s.code]={present:s.p,total:s.t};});}
+function setSS(st,lbl){document.getElementById('sdot').className='dot '+st;document.getElementById('slbl').textContent=lbl;}
+async function initDB(){
+  setSS('load','connecting…');
+  try{
+    if(!SUPABASE_URL||!SUPABASE_KEY)throw'no config';
+    db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+    const{data,error}=await db.from('bunkmeter_data').select('*').eq('id',1).single();
+    if(error||!data){await db.from('bunkmeter_data').upsert({id:1,attendance:ATT,logs:LOGS,updated_at:new Date().toISOString()});}
+    else{ATT=data.attendance;LOGS=data.logs||{};}
+    setSS('ok','synced');
+  }catch(e){setSS('err','offline');loadLocal();}
+  renderAll();
+}
+async function save(){
+  if(db){try{await db.from('bunkmeter_data').upsert({id:1,attendance:ATT,logs:LOGS,updated_at:new Date().toISOString()});setSS('ok','saved ✓');setTimeout(()=>setSS('ok','synced'),2000);}catch(e){setSS('err','sync failed');saveLocal();}}
+  else saveLocal();
+}
+function saveLocal(){try{localStorage.setItem('bm',JSON.stringify({ATT,LOGS}));}catch(e){}}
+function loadLocal(){try{const d=JSON.parse(localStorage.getItem('bm')||'null');if(d){ATT=d.ATT||{};LOGS=d.LOGS||{};}}catch(e){initATT();}}
+
+/* ─── RENDER ALL ─── */
+function renderAll(){renderOV();renderHist();renderCal();renderTT();}
+
+/* ─── OVERVIEW ─── */
+function renderOV(){
+  document.getElementById('ov-spin').style.display='none';
+  document.getElementById('ov-body').style.display='block';
+  const{p,t}=overallAtt();const v=pct(p,t);const col=colVar(p,t);
+  document.getElementById('ov-hero').innerHTML=`
+    <div class="ov-row">
+      <div>
+        <div class="ov-lbl">Overall Attendance</div>
+        <div class="ov-pct mono" style="color:${col}">${v.toFixed(2)}%</div>
+        <div class="ov-sub">${p} present · ${t} total</div>
+      </div>
+      <div class="ov-bar-wrap">
+        <div class="btrack" style="height:7px"><div class="bfill" style="width:${Math.min(v,100)}%;background:${col}"></div></div>
+        <div class="ov-markers"><span>0</span><span style="color:var(--r)">65</span><span style="color:var(--y)">75</span><span style="color:var(--g)">80</span><span>100</span></div>
+      </div>
+    </div>`;
+
+  const s80=SUBJECTS.filter(s=>pct(ATT[s.code]?.present||0,ATT[s.code]?.total||1)>=80).length;
+  const s75=SUBJECTS.filter(s=>{const v=pct(ATT[s.code]?.present||0,ATT[s.code]?.total||1);return v>=75&&v<80;}).length;
+  const s65=SUBJECTS.filter(s=>{const v=pct(ATT[s.code]?.present||0,ATT[s.code]?.total||1);return v>=65&&v<75;}).length;
+  const slow=SUBJECTS.filter(s=>pct(ATT[s.code]?.present||0,ATT[s.code]?.total||1)<65).length;
+  document.getElementById('ov-stats').innerHTML=`
+    <div class="sc"><div class="scv" style="color:var(--g)">${s80}</div><div class="scl">≥80%</div></div>
+    <div class="sc"><div class="scv" style="color:var(--y)">${s75}</div><div class="scl">75–79%</div></div>
+    <div class="sc"><div class="scv" style="color:var(--o)">${s65}</div><div class="scl">65–74%</div></div>
+    <div class="sc"><div class="scv" style="color:var(--r)">${slow}</div><div class="scl">&lt;65%</div></div>`;
+
+  document.getElementById('sj-list').innerHTML=SUBJECTS.map(s=>{
+    const a=ATT[s.code]||{present:s.p,total:s.t};
+    const v=pct(a.present,a.total);const col=colVar(a.present,a.total);
+    const c75=canBunk(s.code,75),c65=canBunk(s.code,65),must=mustAtt(s.code);
+    // 75% tag
+    let t75=v<75?`<span class="tag tr_">Attend ${must} more → 75%</span>`
+      :c75===0?`<span class="tag to">⚠ 0 safe (75%)</span>`
+      :`<span class="tag ty">Miss ${c75} safe (75%)</span>`;
+    // 65% tag
+    let t65=v<65?`<span class="tag tr_">Below 65%!</span>`
+      :c65===0?`<span class="tag to">⚠ 0 safe (65%)</span>`
+      :`<span class="tag tg">Miss ${c65} safe (65%)</span>`;
+    return `<div class="sj">
+      <div class="sj-top">
+        <div class="sj-meta"><div class="sj-code">${s.code}</div><div class="sj-name">${s.name}</div></div>
+        <div class="sj-r">
+          <div class="sj-pct" style="color:${col}">${v.toFixed(2)}%</div>
+          <div class="sj-cnt">${a.present}/${a.total}</div>
+          <span class="tag ${s.type==='lab'?'tb_':'tp'}">${s.type}</span>
+        </div>
+      </div>
+      <div class="btrack" style="height:3px;margin-bottom:.45rem"><div class="bfill" style="width:${Math.min(v,100)}%;background:${col}"></div></div>
+      <div class="sj-bunks">${t75}${t65}</div>
+    </div>`;
+  }).join('');
+}
+
+/* ─── ESTIMATOR ─── */
+function setMode(m){
+  estMode=m;
+  document.getElementById('mA').classList.toggle('on',m==='attend');
+  document.getElementById('mB').classList.toggle('on',m==='bunk');
+  document.getElementById('panelA').style.display=m==='attend'?'block':'none';
+  document.getElementById('panelB').style.display=m==='bunk'?'block':'none';
+  document.getElementById('est-res').innerHTML='';
+}
+
+// Mode A
+function addAttendDate(){
+  const ds=document.getElementById('ea-date').value;
+  if(!ds)return;
+  if(isHol(ds)){showToast('Holiday — no classes','tr');return;}
+  if(attendDates.includes(ds)){showToast('Already added','tr');return;}
+  if(!getSlots(ds).length){showToast('No classes on that day','tr');return;}
+  attendDates.push(ds);attendDates.sort();renderAChips();
+}
+function removeAD(ds){attendDates=attendDates.filter(d=>d!==ds);renderAChips();document.getElementById('est-res').innerHTML='';}
+function clearA(){attendDates=[];renderAChips();document.getElementById('est-res').innerHTML='';}
+function renderAChips(){
+  const w=document.getElementById('ea-chips'),act=document.getElementById('ea-act');
+  if(!attendDates.length){w.innerHTML='';act.style.display='none';return;}
+  act.style.display='block';
+  w.innerHTML=attendDates.map(d=>{
+    const sl=getSlots(d);
+    const u=[...new Set(sl.map(s=>s.code))];
+    return `<div class="chip"><div class="chip-info"><div class="chip-date">${d} · ${dname(d)}</div><div class="chip-name">${u.length} subjects · ${sl.length} periods</div></div><button class="btn btn-d btn-sm" onclick="removeAD('${d}')">✕</button></div>`;
+  }).join('');
+}
+function runAttendAll(){
+  if(!attendDates.length)return;
+  const proj={};SUBJECTS.forEach(s=>{const a=ATT[s.code];proj[s.code]={present:a.present,total:a.total};});
+  const aff=new Set();
+  attendDates.forEach(ds=>getSlots(ds).forEach(sl=>{proj[sl.code].present++;proj[sl.code].total++;aff.add(sl.code);}));
+  showRes(proj,aff,'attend',attendDates,null);
+}
+
+// Mode B
+function refreshBSubjects(){
+  const ds=document.getElementById('eb-date').value;
+  const sel=document.getElementById('eb-subj');
+  if(!ds||isHol(ds)){sel.innerHTML='<option value="">— pick a valid date first —</option>';return;}
+  const slots=getSlots(ds);
+  if(!slots.length){sel.innerHTML='<option value="">No classes on this day</option>';return;}
+  const u=[...new Map(slots.map(s=>[s.code,s])).values()];
+  sel.innerHTML='<option value="">— pick subject —</option>'+u.map(s=>`<option value="${s.code}">${sname(s.code)}</option>`).join('');
+}
+function addBunkEntry(){
+  const ds=document.getElementById('eb-date').value,code=document.getElementById('eb-subj').value;
+  if(!ds||!code){showToast('Pick date and subject','tr');return;}
+  if(isHol(ds)){showToast('Holiday!','tr');return;}
+  bunkEntries.push({date:ds,code});renderBChips();
+}
+function removeBE(i){bunkEntries.splice(i,1);renderBChips();document.getElementById('est-res').innerHTML='';}
+function clearB(){bunkEntries=[];renderBChips();document.getElementById('est-res').innerHTML='';}
+function renderBChips(){
+  const w=document.getElementById('eb-chips'),act=document.getElementById('eb-act');
+  if(!bunkEntries.length){w.innerHTML='';act.style.display='none';return;}
+  act.style.display='block';
+  w.innerHTML=bunkEntries.map((e,i)=>`<div class="chip"><div class="chip-info"><div class="chip-date">${e.date} · ${dname(e.date)}</div><div class="chip-name">${sname(e.code)}</div><div class="chip-sub">${e.code}</div></div><button class="btn btn-d btn-sm" onclick="removeBE(${i})">✕</button></div>`).join('');
+}
+function runBunkEst(){
+  if(!bunkEntries.length)return;
+  const proj={};SUBJECTS.forEach(s=>{const a=ATT[s.code];proj[s.code]={present:a.present,total:a.total};});
+  const bset=new Set(bunkEntries.map(e=>`${e.date}|${e.code}`));
+  const dates=[...new Set(bunkEntries.map(e=>e.date))];
+  const aff=new Set();
+  dates.forEach(ds=>getSlots(ds).forEach(sl=>{proj[sl.code].total++;if(!bset.has(`${ds}|${sl.code}`))proj[sl.code].present++;aff.add(sl.code);}));
+  showRes(proj,aff,'bunk',dates,bset);
+}
+
+function showRes(proj,aff,mode,dates,bset){
+  let tp=0,tt=0;SUBJECTS.forEach(s=>{tp+=proj[s.code].present;tt+=proj[s.code].total;});
+  const{p:cp,t:ct}=overallAtt();
+  const ov=pct(tp,tt),ocol=colVar(tp,tt);
+  const diff=ov-pct(cp,ct);
+  const dtag=Math.abs(diff)<0.01?`<span class="tag tp">No change</span>`:diff>0?`<span class="tag tg">+${diff.toFixed(2)}%</span>`:`<span class="tag tr_">${diff.toFixed(2)}%</span>`;
+  const desc=mode==='attend'?`Attending all classes on ${dates.length} day${dates.length>1?'s':''}`:`Bunking ${bunkEntries.length} class${bunkEntries.length>1?'es':''} across ${dates.length} day${dates.length>1?'s':''}`;
+  let html=`<div class="est-overall"><div class="eol-left"><div class="eol-lbl">Projected Overall</div><div class="eol-val mono" style="color:${ocol}">${ov.toFixed(2)}%</div><div class="eol-sub">${desc} · was ${pct(cp,ct).toFixed(2)}%</div></div><div class="eor">${dtag}${ov<65?'<span class="tag tr_">Below 65%!</span>':ov<75?'<span class="tag to">Below 75%</span>':''}</div></div><div class="sec">Affected Subjects</div><div class="esr-list">`;
+  [...aff].forEach(code=>{
+    const a=ATT[code],pr=proj[code];
+    const oldV=pct(a.present,a.total),newV=pct(pr.present,pr.total);
+    const col=colVar(pr.present,pr.total);
+    const bunked=bset&&[...bset].some(k=>k.endsWith('|'+code));
+    const flag=newV<65?`<span class="tag tr_">Below 65%!</span>`:newV<75?`<span class="tag to">Below 75%</span>`:newV>=80?`<span class="tag tg">Safe</span>`:`<span class="tag ty">OK</span>`;
+    html+=`<div class="esr"><div class="esr-l"><div class="esr-code">${code}${bunked?' <span style="color:var(--r);font-size:.58rem">BUNKED</span>':''}</div><div class="esr-name">${sname(code)}</div></div><div class="esr-r"><span class="esr-old">${oldV.toFixed(1)}%</span><span class="esr-new" style="color:${col}">${newV.toFixed(2)}%</span>${flag}</div></div>`;
+  });
+  html+='</div>';
+  document.getElementById('est-res').innerHTML=html;
+}
+
+/* ─── LOG ─── */
+function initLogDate(){const el=document.getElementById('log-date');el.max=today();el.value=today();}
+
+function loadLog(){
+  const ds=document.getElementById('log-date').value;
+  if(!ds){showToast('Pick a date','tr');return;}
+  if(ds>today()){showToast('Cannot log future dates','tr');return;}
+  const slots=getSlots(ds);
+  const body=document.getElementById('log-body');
+  if(isHol(ds)){const hn=HOL[ds]||'Weekend';body.innerHTML=`<div class="card"><div class="empty">🎉 ${hn}<br>No classes today!</div></div>`;return;}
+  if(!slots.length){body.innerHTML=`<div class="card"><div class="empty">No classes scheduled</div></div>`;return;}
+  const existing=LOGS[ds]||{};
+  logState={};
+  slots.forEach((s,i)=>{const key=`${s.code}_${i}`;logState[key]=existing[key]!==undefined?existing[key]:true;});
+  const editing=!!LOGS[ds];
+  body.innerHTML=`<div class="log-card">
+    <div class="log-card-hdr">
+      <div><div class="lcd">${ds} · ${dname(ds)}</div><div class="lcm">${slots.length} periods${editing?' · <span style="color:var(--g)">✓ previously logged — editing</span>':''}</div></div>
+    </div>
+    ${slots.map((s,i)=>{const key=`${s.code}_${i}`;const isP=logState[key];return`<div class="lp"><div class="lp-info"><div class="lp-time">${s.time}</div><div class="lp-name">${sname(s.code)}</div><div class="lp-code">${s.code}</div></div><div class="tog"><button class="tb ${isP?'pa':''}" onclick="setSlot('${key}',true,this)">P</button><button class="tb ${!isP?'aa':''}" onclick="setSlot('${key}',false,this)">A</button></div></div>`;}).join('')}
+    <div class="log-save-bar"><button class="btn btn-p btn-full" onclick="doSaveLog('${ds}')">${editing?'Update Attendance':'Save Attendance'}</button></div>
+  </div>`;
+}
+
+function setSlot(key,val,btn){
+  logState[key]=val;
+  const row=btn.closest('.tog');
+  row.querySelectorAll('.tb').forEach(b=>b.classList.remove('pa','aa'));
+  btn.classList.add(val?'pa':'aa');
+}
+
+async function doSaveLog(ds){
+  const slots=getSlots(ds);
+  if(LOGS[ds]){const prev=LOGS[ds];slots.forEach((s,i)=>{const k=`${s.code}_${i}`;ATT[s.code].total=Math.max(0,ATT[s.code].total-1);if(prev[k])ATT[s.code].present=Math.max(0,ATT[s.code].present-1);});}
+  LOGS[ds]={};
+  slots.forEach((s,i)=>{const k=`${s.code}_${i}`;const att=logState[k]!==false;LOGS[ds][k]=att;ATT[s.code].total+=1;if(att)ATT[s.code].present+=1;});
+  await save();renderOV();renderHist();renderCal();loadLog();showToast('Saved ✓','tg');
+}
+
+function renderHist(){
+  const ul=document.getElementById('log-hist');
+  const keys=Object.keys(LOGS).sort((a,b)=>b.localeCompare(a));
+  if(!keys.length){ul.innerHTML='<div class="empty">No logs yet.<br>Start from today!</div>';return;}
+  ul.innerHTML=keys.map(ds=>{const log=LOGS[ds];const pres=Object.values(log).filter(Boolean).length;const tot=Object.values(log).length;return`<div class="hist-item"><div><div class="hi-date">${ds} · ${dname(ds)}</div><div class="hi-sum">${pres}/${tot} attended</div></div><div class="hi-acts"><button class="btn btn-s btn-sm" onclick="editLog('${ds}')">Edit</button><button class="btn btn-d btn-sm" onclick="delLog('${ds}')">Del</button></div></div>`;}).join('');
+}
+function editLog(ds){document.getElementById('log-date').value=ds;tab('log');loadLog();window.scrollTo(0,0);}
+async function delLog(ds){
+  if(!confirm(`Delete log for ${ds}?`))return;
+  const prev=LOGS[ds];const slots=getSlots(ds);
+  slots.forEach((s,i)=>{const k=`${s.code}_${i}`;ATT[s.code].total=Math.max(0,ATT[s.code].total-1);if(prev&&prev[k])ATT[s.code].present=Math.max(0,ATT[s.code].present-1);});
+  delete LOGS[ds];await save();renderOV();renderHist();renderCal();showToast('Deleted','tr');
+}
+
+/* ─── CALENDAR ─── */
+function renderCal(){
+  const td=today();let html='';
+  [{y:2025,m:1,lbl:'February 2025'},{y:2025,m:2,lbl:'March 2025'}].forEach(({y,m,lbl})=>{
+    html+=`<div class="cal-mhdr">${lbl}</div><div class="cal-grid">`;
+    ['S','M','T','W','T','F','S'].forEach(d=>html+=`<div class="ch">${d}</div>`);
+    const first=new Date(y,m,1).getDay();
+    const days=new Date(y,m+1,0).getDate();
+    for(let i=0;i<first;i++)html+=`<div class="cc emp"></div>`;
+    for(let d=1;d<=days;d++){
+      const ds=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+      const dow=new Date(ds+'T00:00:00').getDay();
+      const wknd=dow===0||dow===6,hol=!!HOL[ds],logged=!!LOGS[ds],isT=ds===td,past=ds<td;
+      let cls='cc';
+      if(wknd)cls+=' wknd';else if(hol)cls+=' hol';else if(logged)cls+=' logged';
+      if(isT)cls+=' today';else if(past&&!logged&&!wknd&&!hol&&ds>='2025-02-23')cls+=' past';
+      const hname=HOL[ds]||'';
+      const hshort=hname==='Ugadi / Ramzan'?'Ugadi':hname==='Sri Rama Navami'?'Rama Nav.':'';
+      const sl=wknd||hol?[]:getSlots(ds);
+      const dots=[...new Set(sl.map(s=>s.code))].slice(0,5).map(code=>{
+        const v=pct(ATT[code]?.present||0,ATT[code]?.total||1);
+        const c=v>=80?'var(--g)':v>=75?'var(--y)':v>=65?'var(--o)':'var(--r)';
+        return`<span class="cd" style="background:${c}"></span>`;
+      }).join('');
+      html+=`<div class="${cls}"><div class="ccn">${d}</div>${hol?`<div class="cch">${hshort}</div>`:''}<div class="ccd">${dots}</div></div>`;
+    }
+    html+=`</div><div class="divider"></div>`;
+  });
+  document.getElementById('cal-body').innerHTML=html;
+}
+
+/* ─── TIMETABLE ─── */
+function renderTT(){
+  const days=['Mon','Tue','Wed','Thu','Fri'];
+  let html=`<thead><tr><th class="tt-th" style="min-width:68px;text-align:left;padding-left:.5rem">Time</th>${days.map(d=>`<th class="tt-th">${d}</th>`).join('')}</tr></thead><tbody>`;
+  SLOTS.forEach(slot=>{
+    html+=`<tr><td class="tt-time">${SLOT_LBL[slot]}</td>`;
+    for(let day=1;day<=5;day++){
+      const s=TT.find(t=>t.day===day&&t.slot===slot);
+      if(!s)html+=`<td class="tt-c nil"><div class="tt-cn" style="color:var(--tx3)">—</div></td>`;
+      else{const sub=SUBJECTS.find(x=>x.code===s.code);html+=`<td class="tt-c ${sub?.type||'lecture'}"><div class="tt-cn">${sub?.name||s.code}</div><div class="tt-cc">${s.code}</div></td>`;}
+    }
+    html+='</tr>';
+  });
+  html+='</tbody>';
+  document.getElementById('tt-tbl').innerHTML=html;
+}
+
+/* ─── TABS ─── */
+function tab(id){
+  const IDS=['overview','estimator','log','calendar','timetable'];
+  document.querySelectorAll('.nb').forEach((b,i)=>b.classList.toggle('on',IDS[i]===id));
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
+  document.getElementById('pg-'+id).classList.add('on');
+  window.scrollTo(0,0);
+}
+
+/* ─── TOAST ─── */
+let _tt;
+function showToast(msg,cls=''){const el=document.getElementById('toast');el.textContent=msg;el.className='toast '+cls+' show';clearTimeout(_tt);_tt=setTimeout(()=>el.classList.remove('show'),2400);}
+
+/* ─── INIT ─── */
+async function init(){initATT();initLogDate();renderAll();await initDB();}
+init();
+</script>
+</body>
+</html>
