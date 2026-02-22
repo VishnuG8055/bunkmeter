@@ -184,18 +184,38 @@ option{background:var(--s2)}
 .clb{width:8px;height:8px;border-radius:2px;border:1px solid}
 
 /* ═══ TIMETABLE ═══ */
+.tt-legend{display:flex;gap:.5rem;margin-bottom:1rem}
+.tt-li{font-size:.7rem;padding:.25rem .7rem;border-radius:50px;font-weight:700}
+/* Desktop table */
 .tt-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:.5rem}
-.tt-legend{display:flex;gap:.6rem;margin-bottom:.75rem}
-.tt-li{font-size:.68rem;padding:.18rem .55rem;border-radius:var(--rad-xs);font-weight:700}
-.tt-table{min-width:480px;width:100%;border-collapse:separate;border-spacing:3px}
-.tt-th{font-size:.68rem;font-weight:700;color:var(--tx2);padding:.45rem .3rem;text-align:center;background:var(--s2);border-radius:var(--rad-xs)}
-.tt-time{font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--tx3);padding:.35rem .45rem;white-space:nowrap;vertical-align:middle;font-weight:500}
-.tt-c{padding:.45rem .4rem;border-radius:var(--rad-xs);vertical-align:top;text-align:center;min-width:86px}
-.tt-c.lec{background:rgba(245,197,24,.07);border:1px solid rgba(245,197,24,.14)}
-.tt-c.lab{background:rgba(79,142,247,.07);border:1px solid rgba(79,142,247,.13)}
-.tt-c.nil{background:var(--s1);border:1px solid var(--bd);opacity:.3}
-.tt-cn{font-size:.68rem;font-weight:700;line-height:1.25;color:var(--tx);margin-bottom:.18rem}
+.tt-table{min-width:520px;width:100%;border-collapse:separate;border-spacing:4px}
+.tt-th{font-size:.75rem;font-weight:700;color:var(--tx);padding:.65rem .4rem;text-align:center;background:var(--s2);border-radius:var(--rad-s);border:1px solid var(--bd);letter-spacing:.03em}
+.tt-time{font-family:'JetBrains Mono',monospace;font-size:.58rem;color:var(--tx3);padding:.4rem .5rem;white-space:nowrap;vertical-align:middle;text-align:right;font-weight:500}
+.tt-c{padding:.6rem .4rem;border-radius:var(--rad-s);vertical-align:middle;text-align:center;min-width:95px;transition:border-color .15s,transform .12s}
+.tt-c:hover{transform:translateY(-1px)}
+.tt-c.lec{background:rgba(245,197,24,.06);border:1px solid rgba(245,197,24,.22)}
+.tt-c.lec:hover{border-color:rgba(245,197,24,.45)}
+.tt-c.lab{background:rgba(79,142,247,.06);border:1px solid rgba(79,142,247,.22)}
+.tt-c.lab:hover{border-color:rgba(79,142,247,.45)}
+.tt-c.nil{background:transparent;border:1px solid rgba(255,255,255,.05);opacity:.35}
+.tt-cn{font-size:.7rem;font-weight:700;line-height:1.3;color:var(--tx);margin-bottom:.22rem}
 .tt-cc{font-family:'JetBrains Mono',monospace;font-size:.55rem;color:var(--tx3)}
+/* Mobile card view */
+.tt-mobile{display:none;flex-direction:column;gap:.5rem}
+@media(max-width:560px){.tt-wrap{display:none}.tt-mobile{display:flex}}
+.tt-day-block{background:var(--s1);border:1px solid var(--bd);border-radius:var(--rad);overflow:hidden}
+.tt-day-hdr{padding:.6rem 1rem;background:var(--s2);border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between}
+.tt-day-hdr-name{font-size:.85rem;font-weight:700}
+.tt-day-hdr-count{font-size:.65rem;color:var(--tx3)}
+.tt-mob-row{display:flex;align-items:center;padding:.55rem 1rem;border-bottom:1px solid var(--bd);gap:.8rem}
+.tt-mob-row:last-child{border-bottom:none}
+.tt-mob-row.lec-row{border-left:2px solid rgba(245,197,24,.4)}
+.tt-mob-row.lab-row{border-left:2px solid rgba(79,142,247,.4)}
+.tt-mob-time{font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--tx3);flex-shrink:0;width:68px;line-height:1.4}
+.tt-mob-info{flex:1;min-width:0}
+.tt-mob-name{font-size:.82rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tt-mob-code{font-family:'JetBrains Mono',monospace;font-size:.58rem;color:var(--tx3);margin-top:.06rem}
+.tt-mob-badge{font-size:.58rem;font-weight:700;padding:.14rem .45rem;border-radius:var(--rad-xs);flex-shrink:0}
 </style>
 </head>
 <body>
@@ -660,18 +680,37 @@ function renderCal(){
 /* ─── TIMETABLE ─── */
 function renderTT(){
   const days=['Mon','Tue','Wed','Thu','Fri'];
-  let html=`<thead><tr><th class="tt-th" style="min-width:68px;text-align:left;padding-left:.5rem">Time</th>${days.map(d=>`<th class="tt-th">${d}</th>`).join('')}</tr></thead><tbody>`;
+  // Desktop table
+  let html=`<thead><tr><th class="tt-th" style="min-width:72px;text-align:left;padding-left:.6rem;background:transparent;border:none;color:var(--tx3);font-size:.6rem">TIME</th>${days.map(d=>`<th class="tt-th">${d}</th>`).join('')}</tr></thead><tbody>`;
   SLOTS.forEach(slot=>{
-    html+=`<tr><td class="tt-time">${SLOT_LBL[slot]}</td>`;
+    html+=`<tr><td class="tt-time">${SLOT_LBL[slot].split('–')[0]}<br><span style="color:var(--tx3);opacity:.5">–${SLOT_LBL[slot].split('–')[1]}</span></td>`;
     for(let day=1;day<=5;day++){
       const s=TT.find(t=>t.day===day&&t.slot===slot);
-      if(!s)html+=`<td class="tt-c nil"><div class="tt-cn" style="color:var(--tx3)">—</div></td>`;
+      if(!s)html+=`<td class="tt-c nil"><div class="tt-cn">—</div></td>`;
       else{const sub=SUBJECTS.find(x=>x.code===s.code);html+=`<td class="tt-c ${sub?.type||'lecture'}"><div class="tt-cn">${sub?.name||s.code}</div><div class="tt-cc">${s.code}</div></td>`;}
     }
     html+='</tr>';
   });
   html+='</tbody>';
   document.getElementById('tt-tbl').innerHTML=html;
+
+  // Mobile cards
+  const dayNames=['Monday','Tuesday','Wednesday','Thursday','Friday'];
+  let mhtml='';
+  for(let day=1;day<=5;day++){
+    const daySlots=TT.filter(t=>t.day===day).sort((a,b)=>a.slot.localeCompare(b.slot));
+    mhtml+=`<div class="tt-day-block"><div class="tt-day-hdr"><div class="tt-day-hdr-name">${dayNames[day-1]}</div><div class="tt-day-hdr-count">${daySlots.length} periods</div></div>`;
+    daySlots.forEach(s=>{
+      const sub=SUBJECTS.find(x=>x.code===s.code);
+      const type=sub?.type||'lecture';
+      const badge=type==='lab'
+        ?`<span class="tt-mob-badge" style="background:rgba(79,142,247,.1);color:var(--b);border:1px solid rgba(79,142,247,.25)">Lab</span>`
+        :`<span class="tt-mob-badge" style="background:rgba(245,197,24,.1);color:var(--y);border:1px solid rgba(245,197,24,.25)">Lec</span>`;
+      mhtml+=`<div class="tt-mob-row ${type}-row"><div class="tt-mob-time">${s.time.replace('–','–<br>')}</div><div class="tt-mob-info"><div class="tt-mob-name">${sub?.name||s.code}</div><div class="tt-mob-code">${s.code}</div></div>${badge}</div>`;
+    });
+    mhtml+='</div>';
+  }
+  document.getElementById('tt-mobile').innerHTML=mhtml;
 }
 
 /* ─── TABS ─── */
