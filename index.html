@@ -628,7 +628,7 @@ async function delLog(ds){
 /* ─── CALENDAR ─── */
 function renderCal(){
   const td=today();let html='';
-  [{y:2025,m:1,lbl:'February 2026'},{y:2025,m:2,lbl:'March 2026'}].forEach(({y,m,lbl})=>{
+  [{y:2026,m:1,lbl:'February 2026'},{y:2026,m:2,lbl:'March 2026'}].forEach(({y,m,lbl})=>{
     html+=`<div class="cal-mhdr">${lbl}</div><div class="cal-grid">`;
     ['S','M','T','W','T','F','S'].forEach(d=>html+=`<div class="ch">${d}</div>`);
     const first=new Date(y,m,1).getDay();
