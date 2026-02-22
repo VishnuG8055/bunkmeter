@@ -644,7 +644,7 @@ function renderCal(){
       const hname=HOL[ds]||'';
       const hshort=hname==='Ugadi / Ramzan'?'Ugadi':hname==='Sri Rama Navami'?'Rama Nav.':'';
       const sl=wknd||hol?[]:getSlots(ds);
-      const noDotsZone=ds>='2026-02-03'&&ds<='2026-02-21';
+      const noDotsZone=ds>='2026-02-02'&&ds<='2026-02-20';
       const dots=noDotsZone?'':[...new Set(sl.map(s=>s.code))].slice(0,5).map(code=>{
         const v=pct(ATT[code]?.present||0,ATT[code]?.total||1);
         const c=v>=80?'var(--g)':v>=75?'var(--y)':v>=65?'var(--o)':'var(--r)';
