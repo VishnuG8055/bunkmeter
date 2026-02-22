@@ -1,5 +1,5 @@
 [build]
-  publish = "bunkmeter"
+  publish = "."
 
 [[redirects]]
   from = "/*"
