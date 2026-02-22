@@ -234,7 +234,7 @@ option{background:var(--s2)}
     <div class="est-panel">
       <div class="sec" style="margin-bottom:.6rem">Pick dates — see what happens if you attend everything</div>
       <div class="frow">
-        <div class="fg" style="flex:1"><label class="fl">Date</label><input type="date" id="ea-date" min="2025-02-23" max="2025-03-31"></div>
+        <div class="fg" style="flex:1"><label class="fl">Date</label><input type="date" id="ea-date" min="2026-02-23" max="2026-03-31"></div>
         <button class="btn btn-s" onclick="addAttendDate()">+ Add</button>
       </div>
     </div>
@@ -252,7 +252,7 @@ option{background:var(--s2)}
     <div class="est-panel">
       <div class="sec" style="margin-bottom:.6rem">Pick classes to skip — only shows subjects scheduled that day</div>
       <div class="frow">
-        <div class="fg" style="flex:1;min-width:120px"><label class="fl">Date</label><input type="date" id="eb-date" min="2025-02-23" max="2025-03-31" onchange="refreshBSubjects()"></div>
+        <div class="fg" style="flex:1;min-width:120px"><label class="fl">Date</label><input type="date" id="eb-date" min="2026-02-23" max="2026-03-31" onchange="refreshBSubjects()"></div>
         <div class="fg" style="flex:1.4;min-width:130px"><label class="fl">Subject (that day)</label><select id="eb-subj"><option value="">— pick date first —</option></select></div>
         <button class="btn btn-s" onclick="addBunkEntry()">+ Add</button>
       </div>
@@ -365,7 +365,7 @@ const TT = [
 ];
 const SLOTS = ['08','09','10','11','13','14','15'];
 const SLOT_LBL = {'08':'08:00–08:50','09':'09:00–09:50','10':'10:00–10:50','11':'11:00–11:50','13':'13:00–13:50','14':'14:00–14:50','15':'15:00–15:50'};
-const HOL = {'2025-03-20':'Ugadi / Ramzan','2025-03-27':'Sri Rama Navami'};
+const HOL = {'2026-03-20':'Ugadi / Ramzan','2026-03-27':'Sri Rama Navami'};
 
 /* ─── STATE ─── */
 let db=null, ATT={}, LOGS={};
@@ -625,7 +625,7 @@ async function delLog(ds){
 /* ─── CALENDAR ─── */
 function renderCal(){
   const td=today();let html='';
-  [{y:2025,m:1,lbl:'February 2025'},{y:2025,m:2,lbl:'March 2025'}].forEach(({y,m,lbl})=>{
+  [{y:2025,m:1,lbl:'February 2026'},{y:2025,m:2,lbl:'March 2026'}].forEach(({y,m,lbl})=>{
     html+=`<div class="cal-mhdr">${lbl}</div><div class="cal-grid">`;
     ['S','M','T','W','T','F','S'].forEach(d=>html+=`<div class="ch">${d}</div>`);
     const first=new Date(y,m,1).getDay();
@@ -637,7 +637,7 @@ function renderCal(){
       const wknd=dow===0||dow===6,hol=!!HOL[ds],logged=!!LOGS[ds],isT=ds===td,past=ds<td;
       let cls='cc';
       if(wknd)cls+=' wknd';else if(hol)cls+=' hol';else if(logged)cls+=' logged';
-      if(isT)cls+=' today';else if(past&&!logged&&!wknd&&!hol&&ds>='2025-02-23')cls+=' past';
+      if(isT)cls+=' today';else if(past&&!logged&&!wknd&&!hol&&ds>='2026-02-23')cls+=' past';
       const hname=HOL[ds]||'';
       const hshort=hname==='Ugadi / Ramzan'?'Ugadi':hname==='Sri Rama Navami'?'Rama Nav.':'';
       const sl=wknd||hol?[]:getSlots(ds);
