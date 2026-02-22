@@ -1,0 +1,1200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>BunkMeter</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Cabinet+Grotesk:wght@400;500;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root {
+  --bg: #0c0c0e;
+  --s1: #131316;
+  --s2: #1a1a1f;
+  --s3: #222228;
+  --border: #2c2c35;
+  --border2: #3a3a45;
+  --txt: #f0f0f5;
+  --txt2: #a0a0b8;
+  --txt3: #60607a;
+  --green: #22c55e;
+  --green-bg: rgba(34,197,94,0.08);
+  --yellow: #eab308;
+  --yellow-bg: rgba(234,179,8,0.08);
+  --red: #ef4444;
+  --red-bg: rgba(239,68,68,0.08);
+  --blue: #3b82f6;
+  --blue-bg: rgba(59,130,246,0.08);
+  --accent: #7c3aed;
+  --accent-l: #a78bfa;
+  --r: 10px;
+  --r-sm: 6px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Cabinet Grotesk', sans-serif;
+  background: var(--bg);
+  color: var(--txt);
+  min-height: 100dvh;
+  -webkit-font-smoothing: antialiased;
+}
+.mono { font-family: 'DM Mono', monospace; }
+
+/* ─── LAYOUT ─── */
+.app { display: flex; flex-direction: column; min-height: 100dvh; }
+
+/* ─── HEADER ─── */
+.header {
+  position: sticky; top: 0; z-index: 200;
+  background: rgba(12,12,14,0.9);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 1rem;
+  display: flex; align-items: center; justify-content: space-between;
+  height: 56px;
+  gap: 1rem;
+}
+.logo {
+  font-size: 1.1rem; font-weight: 800;
+  letter-spacing: -0.03em;
+  white-space: nowrap;
+}
+.logo em { color: var(--accent-l); font-style: normal; }
+.sync-status {
+  display: flex; align-items: center; gap: 0.4rem;
+  font-size: 0.72rem; color: var(--txt3);
+}
+.sync-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--txt3);
+  transition: background 0.3s;
+}
+.sync-dot.ok { background: var(--green); }
+.sync-dot.err { background: var(--red); }
+
+/* ─── NAV TABS ─── */
+.nav {
+  display: flex; overflow-x: auto; gap: 0;
+  border-bottom: 1px solid var(--border);
+  background: var(--s1);
+  scrollbar-width: none;
+  position: sticky; top: 56px; z-index: 190;
+}
+.nav::-webkit-scrollbar { display: none; }
+.nav-btn {
+  flex-shrink: 0;
+  padding: 0 1.1rem;
+  height: 44px;
+  border: none; background: transparent;
+  color: var(--txt3);
+  font-family: 'Cabinet Grotesk', sans-serif;
+  font-size: 0.82rem; font-weight: 700;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: color 0.2s, border-color 0.2s;
+  white-space: nowrap;
+  letter-spacing: 0.01em;
+}
+.nav-btn.active { color: var(--txt); border-bottom-color: var(--accent-l); }
+.nav-btn:hover:not(.active) { color: var(--txt2); }
+
+/* ─── PAGE ─── */
+.page { display: none; padding: 1.25rem 1rem; max-width: 900px; margin: 0 auto; width: 100%; }
+.page.active { display: block; }
+
+/* ─── SECTION TITLE ─── */
+.sec-title {
+  font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--txt3);
+  margin-bottom: 0.9rem;
+}
+
+/* ─── CARDS ─── */
+.card {
+  background: var(--s1);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 1rem;
+}
+.card + .card { margin-top: 0.75rem; }
+
+/* ─── STAT ROW ─── */
+.stat-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.6rem;
+  margin-bottom: 1.25rem;
+}
+.stat-card {
+  background: var(--s1); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 0.9rem 1rem;
+  text-align: center;
+}
+.stat-val {
+  font-family: 'DM Mono', monospace;
+  font-size: 1.5rem; font-weight: 500;
+  line-height: 1;
+  margin-bottom: 0.3rem;
+}
+.stat-lbl { font-size: 0.7rem; color: var(--txt3); font-weight: 600; }
+
+/* ─── OVERALL CARD ─── */
+.overall-card {
+  background: linear-gradient(135deg, var(--s2) 0%, var(--s1) 100%);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 1.1rem 1.25rem;
+  margin-bottom: 1rem;
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+}
+.overall-label { font-size: 0.78rem; color: var(--txt2); font-weight: 600; margin-bottom: 0.2rem; }
+.overall-pct {
+  font-family: 'DM Mono', monospace;
+  font-size: 2.2rem; font-weight: 500; line-height: 1;
+}
+.overall-sub { font-size: 0.72rem; color: var(--txt3); margin-top: 0.3rem; }
+.overall-bar-wrap { flex: 1; }
+.bar-track { background: var(--s3); border-radius: 100px; height: 8px; overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 100px; transition: width 0.6s cubic-bezier(0.4,0,0.2,1); }
+.threshold-line {
+  position: relative; margin-top: 0.4rem;
+}
+.threshold-label { font-size: 0.65rem; color: var(--txt3); text-align: right; }
+
+/* ─── SUBJECT CARDS ─── */
+.subject-grid { display: flex; flex-direction: column; gap: 0.6rem; }
+.subj-card {
+  background: var(--s1); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 0.9rem 1rem;
+  transition: border-color 0.2s;
+}
+.subj-card:hover { border-color: var(--border2); }
+.subj-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 0.6rem; gap: 0.5rem; }
+.subj-info { flex: 1; min-width: 0; }
+.subj-code { font-family: 'DM Mono', monospace; font-size: 0.65rem; color: var(--txt3); margin-bottom: 0.15rem; }
+.subj-name { font-size: 0.88rem; font-weight: 700; line-height: 1.3; }
+.subj-right { display: flex; flex-direction: column; align-items: flex-end; gap: 0.3rem; flex-shrink: 0; }
+.pct-big { font-family: 'DM Mono', monospace; font-size: 1.3rem; font-weight: 500; line-height: 1; }
+.pct-big.green { color: var(--green); }
+.pct-big.yellow { color: var(--yellow); }
+.pct-big.red { color: var(--red); }
+.type-tag {
+  font-size: 0.6rem; font-weight: 700; padding: 0.2rem 0.5rem;
+  border-radius: 4px; letter-spacing: 0.05em;
+}
+.type-tag.lecture { background: var(--yellow-bg); color: var(--yellow); }
+.type-tag.lab { background: var(--blue-bg); color: var(--blue); }
+.subj-bar-wrap { margin-bottom: 0.5rem; }
+.bar-track-sm { background: var(--s3); border-radius: 100px; height: 4px; overflow: hidden; }
+.bar-fill-sm { height: 100%; border-radius: 100px; }
+.subj-bottom { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
+.present-label { font-size: 0.72rem; color: var(--txt3); }
+.bunk-tag {
+  font-size: 0.68rem; font-weight: 700; padding: 0.2rem 0.55rem;
+  border-radius: 4px; white-space: nowrap;
+}
+.bunk-tag.can { background: var(--green-bg); color: var(--green); }
+.bunk-tag.risky { background: var(--yellow-bg); color: var(--yellow); }
+.bunk-tag.no { background: var(--red-bg); color: var(--red); }
+
+/* ─── ESTIMATOR ─── */
+.estimator-layout { display: flex; flex-direction: column; gap: 1rem; }
+.date-row { display: flex; gap: 0.6rem; align-items: flex-end; flex-wrap: wrap; }
+.form-group { display: flex; flex-direction: column; gap: 0.4rem; flex: 1; min-width: 140px; }
+.form-label { font-size: 0.72rem; color: var(--txt3); font-weight: 700; letter-spacing: 0.05em; }
+input[type="date"], select {
+  background: var(--s2); border: 1px solid var(--border);
+  color: var(--txt); padding: 0.6rem 0.75rem;
+  border-radius: var(--r-sm); font-family: 'Cabinet Grotesk', sans-serif;
+  font-size: 0.85rem; outline: none; width: 100%;
+  transition: border-color 0.2s;
+  -webkit-appearance: none;
+}
+input[type="date"]:focus, select:focus { border-color: var(--accent-l); }
+option { background: var(--s2); }
+.btn {
+  padding: 0.62rem 1.1rem;
+  border: none; border-radius: var(--r-sm);
+  font-family: 'Cabinet Grotesk', sans-serif;
+  font-weight: 700; font-size: 0.85rem; cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s;
+  white-space: nowrap;
+}
+.btn:active { transform: scale(0.97); }
+.btn-primary { background: var(--accent-l); color: #000; }
+.btn-primary:hover { opacity: 0.88; }
+.btn-secondary { background: var(--s3); color: var(--txt); border: 1px solid var(--border); }
+.btn-secondary:hover { border-color: var(--border2); }
+.btn-danger { background: var(--red-bg); color: var(--red); border: 1px solid rgba(239,68,68,0.2); }
+.btn-danger:hover { opacity: 0.8; }
+.btn-sm { padding: 0.4rem 0.75rem; font-size: 0.75rem; }
+
+.bunk-entries { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 0.75rem; }
+.bunk-entry {
+  display: flex; gap: 0.5rem; align-items: center;
+  background: var(--s2); border: 1px solid var(--border);
+  border-radius: var(--r-sm); padding: 0.6rem 0.75rem;
+}
+.bunk-entry-info { flex: 1; }
+.bunk-entry-date { font-family: 'DM Mono', monospace; font-size: 0.72rem; color: var(--accent-l); }
+.bunk-entry-subj { font-size: 0.8rem; font-weight: 600; }
+.add-entry-row { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: flex-end; }
+
+.est-results { margin-top: 0.5rem; }
+.est-overall {
+  background: var(--s2); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 1rem 1.25rem;
+  margin-bottom: 0.75rem;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.est-overall-left .label { font-size: 0.72rem; color: var(--txt3); font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.3rem; }
+.est-overall-left .val { font-family: 'DM Mono', monospace; font-size: 1.6rem; }
+.est-affected-grid { display: flex; flex-direction: column; gap: 0.5rem; }
+.est-subj-result {
+  background: var(--s2); border: 1px solid var(--border);
+  border-radius: var(--r-sm); padding: 0.75rem 1rem;
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+}
+.esr-left .esr-code { font-family: 'DM Mono', monospace; font-size: 0.65rem; color: var(--txt3); }
+.esr-left .esr-name { font-size: 0.85rem; font-weight: 600; }
+.esr-right { display: flex; align-items: center; gap: 0.75rem; flex-shrink: 0; }
+.esr-old { font-family: 'DM Mono', monospace; font-size: 0.8rem; color: var(--txt3); text-decoration: line-through; }
+.esr-new { font-family: 'DM Mono', monospace; font-size: 1.1rem; font-weight: 500; }
+.esr-flag { font-size: 0.7rem; font-weight: 700; padding: 0.2rem 0.5rem; border-radius: 4px; }
+.esr-flag.ok { background: var(--green-bg); color: var(--green); }
+.esr-flag.warn { background: var(--yellow-bg); color: var(--yellow); }
+.esr-flag.bad { background: var(--red-bg); color: var(--red); }
+
+/* ─── LOG ─── */
+.log-date-row { display: flex; gap: 0.6rem; align-items: flex-end; margin-bottom: 1rem; }
+.log-day-card { background: var(--s1); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; }
+.log-day-header { padding: 0.75rem 1rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+.log-day-title { font-weight: 700; font-size: 0.9rem; }
+.log-period {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.7rem 1rem; border-bottom: 1px solid var(--border);
+  gap: 0.75rem;
+}
+.log-period:last-child { border-bottom: none; }
+.log-period-info { flex: 1; }
+.log-period-time { font-family: 'DM Mono', monospace; font-size: 0.68rem; color: var(--txt3); margin-bottom: 0.1rem; }
+.log-period-name { font-size: 0.85rem; font-weight: 600; }
+.log-period-code { font-family: 'DM Mono', monospace; font-size: 0.65rem; color: var(--txt3); }
+.toggle-row { display: flex; border: 1px solid var(--border); border-radius: var(--r-sm); overflow: hidden; }
+.toggle-btn {
+  padding: 0.35rem 0.75rem; border: none; background: transparent;
+  font-family: 'Cabinet Grotesk', sans-serif; font-size: 0.75rem; font-weight: 700;
+  cursor: pointer; transition: background 0.15s, color 0.15s;
+  color: var(--txt3);
+}
+.toggle-btn.p-active { background: var(--green-bg); color: var(--green); }
+.toggle-btn.a-active { background: var(--red-bg); color: var(--red); }
+
+.log-save-row { padding: 0.75rem 1rem; border-top: 1px solid var(--border); }
+.log-history { margin-top: 1rem; }
+.log-hist-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.75rem 1rem;
+  background: var(--s1); border: 1px solid var(--border); border-radius: var(--r);
+  margin-bottom: 0.5rem; gap: 0.75rem;
+}
+.lhi-date { font-family: 'DM Mono', monospace; font-size: 0.75rem; color: var(--accent-l); font-weight: 500; }
+.lhi-summary { font-size: 0.78rem; color: var(--txt2); }
+.lhi-actions { display: flex; gap: 0.4rem; flex-shrink: 0; }
+
+/* ─── CALENDAR ─── */
+.cal-month-title { font-weight: 800; font-size: 1rem; margin-bottom: 0.75rem; }
+.cal-grid {
+  display: grid; grid-template-columns: repeat(7,1fr);
+  gap: 3px; margin-bottom: 1.5rem;
+}
+.cal-head { text-align: center; font-size: 0.65rem; font-weight: 700; color: var(--txt3); padding: 0.4rem 0; }
+.cal-cell {
+  aspect-ratio: 1; border-radius: 6px; border: 1px solid transparent;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  font-size: 0.75rem; font-weight: 600; position: relative;
+  background: var(--s1); color: var(--txt2);
+  cursor: default;
+}
+.cal-cell.empty { background: transparent; border-color: transparent; }
+.cal-cell.weekend { opacity: 0.35; }
+.cal-cell.holiday { background: rgba(239,68,68,0.06); color: var(--red); border-color: rgba(239,68,68,0.15); }
+.cal-cell.logged { background: var(--green-bg); border-color: rgba(34,197,94,0.25); color: var(--green); }
+.cal-cell.today { border-color: var(--accent-l); color: var(--txt); }
+.cal-cell.past:not(.logged):not(.holiday):not(.weekend) { opacity: 0.5; }
+.cal-num { font-family: 'DM Mono', monospace; font-size: 0.72rem; line-height: 1; }
+.cal-dot-row { display: flex; gap: 1px; margin-top: 2px; flex-wrap: wrap; justify-content: center; }
+.cal-dot { width: 3px; height: 3px; border-radius: 50%; }
+.cal-legend { display: flex; gap: 1rem; flex-wrap: wrap; font-size: 0.72rem; color: var(--txt3); margin-top: 0.75rem; }
+.cal-legend-item { display: flex; align-items: center; gap: 0.4rem; }
+.cal-legend-box { width: 10px; height: 10px; border-radius: 3px; border: 1px solid; }
+
+/* ─── TIMETABLE ─── */
+.tt-grid {
+  display: grid; gap: 0.5rem;
+}
+.tt-time-block { margin-bottom: 1rem; }
+.tt-time-label {
+  font-family: 'DM Mono', monospace; font-size: 0.72rem; color: var(--accent-l);
+  font-weight: 500; margin-bottom: 0.4rem; padding-left: 0.1rem;
+}
+.tt-day-row { display: grid; grid-template-columns: repeat(5,1fr); gap: 0.4rem; }
+.tt-cell {
+  border-radius: var(--r-sm); padding: 0.5rem 0.6rem;
+  font-size: 0.72rem; border: 1px solid transparent; min-height: 56px;
+  display: flex; flex-direction: column; justify-content: space-between;
+}
+.tt-cell.lecture { background: rgba(234,179,8,0.07); border-color: rgba(234,179,8,0.15); }
+.tt-cell.lab { background: rgba(59,130,246,0.07); border-color: rgba(59,130,246,0.12); }
+.tt-cell.empty-cell { background: var(--s1); border-color: var(--border); opacity: 0.4; }
+.tt-cell-name { font-weight: 700; line-height: 1.2; margin-bottom: 0.25rem; color: var(--txt); }
+.tt-cell-code { font-family: 'DM Mono', monospace; font-size: 0.6rem; color: var(--txt3); }
+.tt-cell-room { font-size: 0.65rem; color: var(--txt3); margin-top: 0.15rem; }
+.tt-day-headers { display: grid; grid-template-columns: repeat(5,1fr); gap: 0.4rem; margin-bottom: 0.4rem; }
+.tt-day-hdr { text-align: center; font-size: 0.68rem; font-weight: 700; color: var(--txt3); padding: 0.3rem; }
+.tt-legend { display: flex; gap: 1rem; margin-bottom: 1rem; }
+
+/* ─── EMPTY / LOADING ─── */
+.empty { text-align: center; padding: 2.5rem 1rem; color: var(--txt3); font-size: 0.85rem; }
+.loading { text-align: center; padding: 1.5rem; color: var(--txt3); font-size: 0.8rem; }
+
+/* ─── TOAST ─── */
+.toast {
+  position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%) translateY(80px);
+  background: var(--s2); border: 1px solid var(--border);
+  border-radius: 50px; padding: 0.65rem 1.25rem;
+  font-size: 0.82rem; font-weight: 600; color: var(--txt);
+  z-index: 999; transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s;
+  opacity: 0; white-space: nowrap; box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+.toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+.toast.green { border-color: rgba(34,197,94,0.4); color: var(--green); }
+.toast.red { border-color: rgba(239,68,68,0.4); color: var(--red); }
+
+/* ─── SCROLLBAR ─── */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+/* ─── MOBILE ─── */
+@media (max-width: 480px) {
+  .stat-row { grid-template-columns: repeat(3,1fr); }
+  .stat-val { font-size: 1.2rem; }
+  .tt-cell { min-height: 48px; padding: 0.4rem; }
+  .tt-cell-name { font-size: 0.65rem; }
+  .overall-pct { font-size: 1.8rem; }
+}
+
+.divider { height: 1px; background: var(--border); margin: 1rem 0; }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="header">
+    <div class="logo">Bunk<em>Meter</em></div>
+    <div class="sync-status">
+      <div class="sync-dot" id="sync-dot"></div>
+      <span id="sync-label">connecting…</span>
+    </div>
+  </header>
+
+  <nav class="nav">
+    <button class="nav-btn active" onclick="switchTab('overview')">Overview</button>
+    <button class="nav-btn" onclick="switchTab('estimator')">Estimator</button>
+    <button class="nav-btn" onclick="switchTab('log')">Log</button>
+    <button class="nav-btn" onclick="switchTab('calendar')">Calendar</button>
+    <button class="nav-btn" onclick="switchTab('timetable')">Timetable</button>
+  </nav>
+
+  <!-- OVERVIEW -->
+  <div class="page active" id="page-overview">
+    <div id="ov-loading" class="loading">Loading…</div>
+    <div id="ov-content" style="display:none">
+      <div class="overall-card" id="overall-card"></div>
+      <div class="stat-row" id="stat-row"></div>
+      <div class="sec-title">Subjects</div>
+      <div class="subject-grid" id="subj-grid"></div>
+    </div>
+  </div>
+
+  <!-- ESTIMATOR -->
+  <div class="page" id="page-estimator">
+    <div class="card" style="margin-bottom:1rem">
+      <div class="sec-title" style="margin-bottom:0.75rem">Add Bunk Entry</div>
+      <div class="add-entry-row">
+        <div class="form-group">
+          <label class="form-label">Date</label>
+          <input type="date" id="est-date" min="2025-02-23" max="2025-03-31">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Subject</label>
+          <select id="est-subject">
+            <option value="">— pick subject —</option>
+          </select>
+        </div>
+        <button class="btn btn-secondary" onclick="addBunkEntry()">+ Add</button>
+      </div>
+    </div>
+
+    <div id="bunk-entries-wrap" style="display:none; margin-bottom:1rem">
+      <div class="sec-title">Planned Bunks</div>
+      <div class="bunk-entries" id="bunk-entries-list"></div>
+      <div style="display:flex;gap:0.5rem;flex-wrap:wrap">
+        <button class="btn btn-primary" onclick="runEstimator()">Estimate Impact</button>
+        <button class="btn btn-secondary" onclick="clearBunkEntries()">Clear All</button>
+      </div>
+    </div>
+
+    <div id="est-results"></div>
+  </div>
+
+  <!-- LOG -->
+  <div class="page" id="page-log">
+    <div class="card" style="margin-bottom:1rem">
+      <div class="log-date-row">
+        <div class="form-group">
+          <label class="form-label">Date (today or earlier)</label>
+          <input type="date" id="log-date">
+        </div>
+        <button class="btn btn-primary" onclick="loadDayForLog()">Load</button>
+      </div>
+    </div>
+    <div id="log-schedule"></div>
+    <div class="log-history">
+      <div class="sec-title" style="margin-top:1.5rem;margin-bottom:0.75rem">History</div>
+      <div id="log-history-list"></div>
+    </div>
+  </div>
+
+  <!-- CALENDAR -->
+  <div class="page" id="page-calendar">
+    <div id="cal-content"></div>
+    <div class="cal-legend">
+      <div class="cal-legend-item"><div class="cal-legend-box" style="background:var(--green-bg);border-color:rgba(34,197,94,0.4)"></div>Logged</div>
+      <div class="cal-legend-item"><div class="cal-legend-box" style="background:rgba(239,68,68,0.06);border-color:rgba(239,68,68,0.2)"></div>Holiday</div>
+      <div class="cal-legend-item"><div class="cal-legend-box" style="border-color:var(--accent-l)"></div>Today</div>
+    </div>
+  </div>
+
+  <!-- TIMETABLE -->
+  <div class="page" id="page-timetable">
+    <div class="tt-legend" style="margin-bottom:0.75rem">
+      <span style="font-size:0.72rem;padding:0.2rem 0.6rem;background:rgba(234,179,8,0.07);border:1px solid rgba(234,179,8,0.2);border-radius:4px;color:var(--yellow);font-weight:700">Lecture</span>
+      <span style="font-size:0.72rem;padding:0.2rem 0.6rem;background:rgba(59,130,246,0.07);border:1px solid rgba(59,130,246,0.15);border-radius:4px;color:var(--blue);font-weight:700">Lab</span>
+    </div>
+    <div class="tt-day-headers" id="tt-day-headers"></div>
+    <div id="tt-content"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════════
+// CONFIG — fill in your Supabase details in config.js
+// ══════════════════════════════════════════════════
+const SUPABASE_URL = window.SUPABASE_URL || '';
+const SUPABASE_KEY = window.SUPABASE_ANON_KEY || '';
+
+// ══════════════════════════════════════════════════
+// STATIC DATA
+// ══════════════════════════════════════════════════
+const INITIAL = [
+  { code:'19ECB332',  name:'Computer Networks',            present:17, total:24, type:'lecture' },
+  { code:'19ECB332P', name:'Computer Networks Lab',        present:22, total:28, type:'lab' },
+  { code:'19ECB334',  name:'Information Security',         present:19, total:21, type:'lecture' },
+  { code:'19ECB334P', name:'Information Security Lab',     present:15, total:16, type:'lab' },
+  { code:'19ECB336',  name:'Artificial Intelligence',      present:16, total:24, type:'lecture' },
+  { code:'19ECB336P', name:'AI Lab',                       present:10, total:14, type:'lab' },
+  { code:'19ECB346',  name:'Data Mining & Analytics',      present:13, total:15, type:'lecture' },
+  { code:'19ECB346P', name:'Data Mining Lab',              present:16, total:16, type:'lab' },
+  { code:'19EHS331',  name:'Business Communication',       present:12, total:15, type:'lecture' },
+  { code:'19EHS331P', name:'Business Comm Lab',            present:12, total:16, type:'lab' },
+  { code:'19EID302',  name:'Financial & Cost Accounting',  present:15, total:17, type:'lecture' },
+  { code:'24CSEN1081',name:'Intermediate Coding-II',       present:9,  total:16, type:'lecture' },
+  { code:'HSMCH102',  name:'Universal Human Values 2',     present:16, total:24, type:'lecture' },
+];
+
+// day: 1=Mon…5=Fri
+const TT = [
+  // Monday
+  { day:1, time:'08:00–08:50', code:'19ECB334',  room:'ICT/236' },
+  { day:1, time:'09:00–09:50', code:'19ECB346',  room:'ICT/236' },
+  { day:1, time:'10:00–10:50', code:'19ECB332P', room:'ICT/6021' },
+  { day:1, time:'11:00–11:50', code:'19ECB332P', room:'ICT/6021' },
+  { day:1, time:'13:00–13:50', code:'19EHS331',  room:'ICT/236' },
+  { day:1, time:'14:00–14:50', code:'19ECB336P', room:'ICT/123' },
+  { day:1, time:'15:00–15:50', code:'19ECB336P', room:'ICT/123' },
+  // Tuesday
+  { day:2, time:'08:00–08:50', code:'19EHS331P', room:'ICT/123' },
+  { day:2, time:'09:00–09:50', code:'19EHS331P', room:'ICT/123' },
+  { day:2, time:'10:00–10:50', code:'19ECB332',  room:'ICT/236' },
+  { day:2, time:'11:00–11:50', code:'19ECB336',  room:'ICT/236' },
+  { day:2, time:'13:00–13:50', code:'HSMCH102',  room:'ICT/236' },
+  { day:2, time:'14:00–14:50', code:'24CSEN1081',room:'ICT/123' },
+  { day:2, time:'15:00–15:50', code:'24CSEN1081',room:'ICT/123' },
+  // Wednesday
+  { day:3, time:'08:00–08:50', code:'19ECB336',  room:'ICT/236' },
+  { day:3, time:'09:00–09:50', code:'19ECB332',  room:'ICT/236' },
+  { day:3, time:'10:00–10:50', code:'19ECB334P', room:'ICT/6021' },
+  { day:3, time:'11:00–11:50', code:'19ECB334P', room:'ICT/6021' },
+  { day:3, time:'13:00–13:50', code:'19EID302',  room:'ICT/236' },
+  { day:3, time:'14:00–14:50', code:'HSMCH102',  room:'ICT/236' },
+  // Thursday
+  { day:4, time:'08:00–08:50', code:'19ECB332P', room:'ICT/6021' },
+  { day:4, time:'09:00–09:50', code:'19ECB332P', room:'ICT/6021' },
+  { day:4, time:'10:00–10:50', code:'19ECB346',  room:'ICT/236' },
+  { day:4, time:'11:00–11:50', code:'19EHS331',  room:'ICT/236' },
+  { day:4, time:'13:00–13:50', code:'HSMCH102',  room:'ICT/236' },
+  { day:4, time:'14:00–14:50', code:'19ECB334',  room:'ICT/236' },
+  // Friday
+  { day:5, time:'08:00–08:50', code:'19ECB346P', room:'ICT/6021' },
+  { day:5, time:'09:00–09:50', code:'19ECB346P', room:'ICT/6021' },
+  { day:5, time:'10:00–10:50', code:'19ECB334',  room:'ICT/236' },
+  { day:5, time:'11:00–11:50', code:'19ECB332',  room:'ICT/236' },
+  { day:5, time:'13:00–13:50', code:'19EID302',  room:'ICT/236' },
+  { day:5, time:'14:00–14:50', code:'19ECB336',  room:'ICT/236' },
+];
+
+const HOLIDAYS = new Set(['2025-03-20','2025-03-27']);
+const ALL_TIMES = ['08:00–08:50','09:00–09:50','10:00–10:50','11:00–11:50','13:00–13:50','14:00–14:50','15:00–15:50'];
+
+// ══════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════
+let db = null;
+let attendance = {}; // code -> { present, total }
+let logs = {};       // date -> { slotKey: bool }
+let bunkEntries = []; // [{date, code}]
+
+// ══════════════════════════════════════════════════
+// SUPABASE
+// ══════════════════════════════════════════════════
+async function initDB() {
+  try {
+    if (!SUPABASE_URL || !SUPABASE_KEY) throw new Error('No config');
+    db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    setSyncStatus('ok', 'synced');
+  } catch(e) {
+    setSyncStatus('err', 'offline');
+    loadLocal();
+    return;
+  }
+  await loadFromDB();
+}
+
+function setSyncStatus(state, label) {
+  document.getElementById('sync-dot').className = 'sync-dot ' + state;
+  document.getElementById('sync-label').textContent = label;
+}
+
+async function loadFromDB() {
+  try {
+    const { data, error } = await db.from('bunkmeter_data').select('*').eq('id', 1).single();
+    if (error || !data) {
+      // First run — initialize with base data
+      initAttendance();
+      await saveToDB();
+    } else {
+      attendance = data.attendance;
+      logs = data.logs;
+    }
+    setSyncStatus('ok', 'synced');
+  } catch(e) {
+    setSyncStatus('err', 'offline');
+    loadLocal();
+  }
+  renderAll();
+}
+
+async function saveToDB() {
+  if (!db) { saveLocal(); return; }
+  try {
+    await db.from('bunkmeter_data').upsert({ id: 1, attendance, logs, updated_at: new Date().toISOString() });
+    setSyncStatus('ok', 'saved ✓');
+    setTimeout(() => setSyncStatus('ok', 'synced'), 2000);
+  } catch(e) {
+    setSyncStatus('err', 'save failed');
+    saveLocal();
+  }
+}
+
+function saveLocal() {
+  try { localStorage.setItem('bm_data', JSON.stringify({ attendance, logs })); } catch(e){}
+}
+
+function loadLocal() {
+  try {
+    const d = JSON.parse(localStorage.getItem('bm_data') || 'null');
+    if (d) { attendance = d.attendance; logs = d.logs; }
+    else initAttendance();
+  } catch(e) { initAttendance(); }
+}
+
+function initAttendance() {
+  INITIAL.forEach(s => { attendance[s.code] = { present: s.present, total: s.total }; });
+}
+
+// ══════════════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════════════
+function pct(p, t) { return t === 0 ? 0 : (p / t) * 100; }
+function fmtPct(p, t) { return pct(p, t).toFixed(2) + '%'; }
+function colorOf(p, t) {
+  const v = pct(p, t);
+  return v >= 80 ? 'green' : v >= 75 ? 'yellow' : 'red';
+}
+
+function isHoliday(ds) {
+  if (HOLIDAYS.has(ds)) return true;
+  const d = new Date(ds + 'T00:00:00');
+  return d.getDay() === 0 || d.getDay() === 6;
+}
+
+function getSlots(ds) {
+  if (isHoliday(ds)) return [];
+  const d = new Date(ds + 'T00:00:00');
+  const dow = d.getDay(); // 1-5
+  return TT.filter(t => t.day === dow);
+}
+
+function subjectName(code) {
+  return (INITIAL.find(s => s.code === code) || {}).name || code;
+}
+
+function todayStr() {
+  return new Date().toISOString().split('T')[0];
+}
+
+function overallPct() {
+  let tp = 0, tt = 0;
+  INITIAL.forEach(s => {
+    const a = attendance[s.code];
+    if (a) { tp += a.present; tt += a.total; }
+  });
+  return { p: tp, t: tt };
+}
+
+function bunkableCount(code) {
+  const a = attendance[code];
+  if (!a) return 0;
+  // p / (t + x) >= 0.75 and we bunk x -> p / (t + x) where bunked ones don't count
+  // Actually: to stay >=75% with current: (present)/(total) already set
+  // Can bunk x more if: present/(total+x) >= 0.75 => x <= (present - 0.75*total)/0.75
+  const x = (a.present - 0.75 * a.total) / 0.75;
+  return Math.max(0, Math.floor(x));
+}
+
+function toMustAttend(code) {
+  // how many must attend to reach 75% if below
+  const a = attendance[code];
+  if (!a) return 0;
+  if (pct(a.present, a.total) >= 75) return 0;
+  // (present + x) / (total + x) = 0.75 => x = (0.75*total - present) / 0.25
+  const x = (0.75 * a.total - a.present) / 0.25;
+  return Math.ceil(x);
+}
+
+// ══════════════════════════════════════════════════
+// RENDER ALL
+// ══════════════════════════════════════════════════
+function renderAll() {
+  renderOverview();
+  renderHistory();
+  renderCalendar();
+  renderTimetable();
+  initEstimatorSubjects();
+}
+
+// ══════════════════════════════════════════════════
+// OVERVIEW
+// ══════════════════════════════════════════════════
+function renderOverview() {
+  document.getElementById('ov-loading').style.display = 'none';
+  document.getElementById('ov-content').style.display = 'block';
+
+  const { p, t } = overallPct();
+  const v = pct(p, t);
+  const col = v >= 80 ? 'var(--green)' : v >= 75 ? 'var(--yellow)' : 'var(--red)';
+  document.getElementById('overall-card').innerHTML = `
+    <div>
+      <div class="overall-label">Overall Attendance</div>
+      <div class="overall-pct mono" style="color:${col}">${v.toFixed(2)}%</div>
+      <div class="overall-sub">${p} present / ${t} total classes</div>
+    </div>
+    <div class="overall-bar-wrap">
+      <div class="bar-track"><div class="bar-fill" style="width:${Math.min(v,100)}%;background:${col}"></div></div>
+      <div class="threshold-label">75% threshold</div>
+    </div>
+  `;
+
+  const safe = INITIAL.filter(s => pct(attendance[s.code]?.present||0, attendance[s.code]?.total||1) >= 80).length;
+  const low  = INITIAL.filter(s => pct(attendance[s.code]?.present||0, attendance[s.code]?.total||1) < 75).length;
+  const warn = INITIAL.length - safe - low;
+  document.getElementById('stat-row').innerHTML = `
+    <div class="stat-card"><div class="stat-val" style="color:var(--green)">${safe}</div><div class="stat-lbl">≥80%</div></div>
+    <div class="stat-card"><div class="stat-val" style="color:var(--yellow)">${warn}</div><div class="stat-lbl">75–79%</div></div>
+    <div class="stat-card"><div class="stat-val" style="color:var(--red)">${low}</div><div class="stat-lbl">&lt;75%</div></div>
+  `;
+
+  document.getElementById('subj-grid').innerHTML = INITIAL.map(s => {
+    const a = attendance[s.code] || { present: s.present, total: s.total };
+    const v = pct(a.present, a.total);
+    const col = colorOf(a.present, a.total);
+    const can = bunkableCount(s.code);
+    const must = toMustAttend(s.code);
+    let bunkHtml = '';
+    if (v < 75) {
+      bunkHtml = `<span class="bunk-tag no">Attend ${must} more to reach 75%</span>`;
+    } else if (can === 0) {
+      bunkHtml = `<span class="bunk-tag risky">⚠ Don't miss any</span>`;
+    } else {
+      bunkHtml = `<span class="bunk-tag can">✓ ${can} class${can>1?'es':''} safe to miss</span>`;
+    }
+    return `
+    <div class="subj-card">
+      <div class="subj-top">
+        <div class="subj-info">
+          <div class="subj-code">${s.code}</div>
+          <div class="subj-name">${s.name}</div>
+        </div>
+        <div class="subj-right">
+          <div class="pct-big ${col}">${v.toFixed(2)}%</div>
+          <span class="type-tag ${s.type}">${s.type.charAt(0).toUpperCase()+s.type.slice(1)}</span>
+        </div>
+      </div>
+      <div class="subj-bar-wrap">
+        <div class="bar-track-sm"><div class="bar-fill-sm" style="width:${Math.min(v,100)}%;background:var(--${col})"></div></div>
+      </div>
+      <div class="subj-bottom">
+        <span class="present-label">${a.present} / ${a.total} classes</span>
+        ${bunkHtml}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════════════
+// ESTIMATOR
+// ══════════════════════════════════════════════════
+function initEstimatorSubjects() {
+  const sel = document.getElementById('est-subject');
+  sel.innerHTML = '<option value="">— pick subject —</option>' +
+    INITIAL.map(s => `<option value="${s.code}">${s.name}</option>`).join('');
+}
+
+function addBunkEntry() {
+  const date = document.getElementById('est-date').value;
+  const code = document.getElementById('est-subject').value;
+  if (!date || !code) { showToast('Pick date and subject', 'red'); return; }
+  if (isHoliday(date)) { showToast('That day is a holiday!', 'red'); return; }
+  const slots = getSlots(date);
+  if (!slots.find(s => s.code === code)) {
+    showToast('Subject not scheduled on that day', 'red'); return;
+  }
+  bunkEntries.push({ date, code });
+  renderBunkEntries();
+}
+
+function renderBunkEntries() {
+  const wrap = document.getElementById('bunk-entries-wrap');
+  const list = document.getElementById('bunk-entries-list');
+  if (bunkEntries.length === 0) { wrap.style.display = 'none'; document.getElementById('est-results').innerHTML = ''; return; }
+  wrap.style.display = 'block';
+  list.innerHTML = bunkEntries.map((e,i) => `
+    <div class="bunk-entry">
+      <div class="bunk-entry-info">
+        <div class="bunk-entry-date">${e.date}</div>
+        <div class="bunk-entry-subj">${subjectName(e.code)} <span style="font-size:0.65rem;color:var(--txt3)">${e.code}</span></div>
+      </div>
+      <button class="btn btn-danger btn-sm" onclick="removeBunkEntry(${i})">✕</button>
+    </div>`).join('');
+}
+
+function removeBunkEntry(i) {
+  bunkEntries.splice(i, 1);
+  renderBunkEntries();
+  document.getElementById('est-results').innerHTML = '';
+}
+
+function clearBunkEntries() {
+  bunkEntries = [];
+  renderBunkEntries();
+}
+
+function runEstimator() {
+  if (bunkEntries.length === 0) return;
+  // Compute cumulative impact
+  // Group bunks by subject — count how many classes bunked per subject
+  const bunkCount = {}; // code -> number of classes bunked
+  const futureClassCount = {}; // code -> total classes added (bunked+attended) to compute denominator
+
+  // For each unique date in bunk entries, count all classes that day
+  // Classes not bunked => attended (present+1, total+1), classes bunked => (total+1 only)
+  const dateSet = [...new Set(bunkEntries.map(e => e.date))].sort();
+
+  // Collect all classes across affected dates
+  const dayClasses = {}; // date -> slots[]
+  dateSet.forEach(d => { dayClasses[d] = getSlots(d); });
+
+  // For each date, determine bunked slots
+  // A slot is bunked if (date, code) is in bunkEntries
+  const bunkSet = new Set(bunkEntries.map(e => `${e.date}|${e.code}`));
+
+  // Compute projected attendance per subject
+  const projected = {}; // code -> { present, total }
+  INITIAL.forEach(s => {
+    const a = attendance[s.code];
+    projected[s.code] = { present: a.present, total: a.total };
+  });
+
+  dateSet.forEach(date => {
+    const slots = dayClasses[date];
+    slots.forEach(slot => {
+      const key = `${date}|${slot.code}`;
+      projected[slot.code].total += 1;
+      if (!bunkSet.has(key)) {
+        projected[slot.code].present += 1;
+      }
+    });
+  });
+
+  // Overall projected
+  let tp = 0, tt = 0;
+  INITIAL.forEach(s => { tp += projected[s.code].present; tt += projected[s.code].total; });
+  const overallNow = overallPct();
+  const overallV = pct(tp, tt);
+
+  // Find affected subjects (those with classes on bunked dates)
+  const affectedCodes = new Set();
+  dateSet.forEach(date => {
+    dayClasses[date].forEach(s => affectedCodes.add(s.code));
+  });
+
+  const { p: cp, t: ct } = overallPct();
+
+  let html = `
+    <div class="est-overall">
+      <div class="est-overall-left">
+        <div class="label">Overall After Bunks</div>
+        <div class="val mono" style="color:${overallV>=75?'var(--green)':'var(--red)'}">${overallV.toFixed(2)}%</div>
+        <div style="font-size:0.72rem;color:var(--txt3);margin-top:0.2rem">was ${pct(cp,ct).toFixed(2)}% · bunking ${bunkEntries.length} class${bunkEntries.length>1?'es':''} over ${dateSet.length} day${dateSet.length>1?'s':''}</div>
+      </div>
+    </div>
+    <div class="sec-title">Affected Subjects</div>
+    <div class="est-affected-grid">`;
+
+  [...affectedCodes].forEach(code => {
+    const a = attendance[code];
+    const pr = projected[code];
+    const oldV = pct(a.present, a.total);
+    const newV = pct(pr.present, pr.total);
+    const col = colorOf(pr.present, pr.total);
+    const isBunked = bunkEntries.some(e => e.code === code);
+    let flag = '';
+    if (newV < 75) flag = `<span class="esr-flag bad">Below 75%!</span>`;
+    else if (newV < 80) flag = `<span class="esr-flag warn">Risky</span>`;
+    else flag = `<span class="esr-flag ok">Safe</span>`;
+    html += `
+      <div class="est-subj-result">
+        <div class="esr-left">
+          <div class="esr-code">${code}${isBunked?' <span style="color:var(--red)">BUNKED</span>':''}</div>
+          <div class="esr-name">${subjectName(code)}</div>
+        </div>
+        <div class="esr-right">
+          <span class="esr-old">${oldV.toFixed(1)}%</span>
+          <span class="esr-new ${col}">${newV.toFixed(2)}%</span>
+          ${flag}
+        </div>
+      </div>`;
+  });
+
+  html += '</div>';
+  document.getElementById('est-results').innerHTML = html;
+}
+
+// ══════════════════════════════════════════════════
+// LOG
+// ══════════════════════════════════════════════════
+let logState = {}; // slotKey -> bool
+
+function initLog() {
+  const logInput = document.getElementById('log-date');
+  const today = todayStr();
+  logInput.max = today;
+  logInput.value = today;
+}
+
+function loadDayForLog() {
+  const date = document.getElementById('log-date').value;
+  if (!date) return;
+  const today = todayStr();
+  if (date > today) { showToast('Cannot log future dates', 'red'); return; }
+
+  const slots = getSlots(date);
+  const wrap = document.getElementById('log-schedule');
+
+  if (isHoliday(date)) {
+    wrap.innerHTML = `<div class="card"><div class="empty">🎉 Holiday — no classes!</div></div>`;
+    return;
+  }
+  if (slots.length === 0) {
+    wrap.innerHTML = `<div class="card"><div class="empty">No classes on this day.</div></div>`;
+    return;
+  }
+
+  const existing = logs[date] || {};
+  logState = {};
+  slots.forEach((s,i) => {
+    const key = `${s.code}_${i}`;
+    logState[key] = existing[key] !== undefined ? existing[key] : true;
+  });
+
+  const alreadyLogged = !!logs[date];
+  wrap.innerHTML = `
+    <div class="log-day-card">
+      <div class="log-day-header">
+        <div class="log-day-title">${date}${alreadyLogged?' <span style="font-size:0.7rem;color:var(--green);font-weight:600">✓ logged</span>':''}</div>
+        <span style="font-size:0.72rem;color:var(--txt3)">${slots.length} periods</span>
+      </div>
+      ${slots.map((s,i) => {
+        const key = `${s.code}_${i}`;
+        const isP = logState[key];
+        return `
+        <div class="log-period">
+          <div class="log-period-info">
+            <div class="log-period-time">${s.time}</div>
+            <div class="log-period-name">${subjectName(s.code)}</div>
+            <div class="log-period-code">${s.code} · ${s.room}</div>
+          </div>
+          <div class="toggle-row">
+            <button class="toggle-btn ${isP?'p-active':''}" onclick="setSlot('${key}',true,this)">P</button>
+            <button class="toggle-btn ${!isP?'a-active':''}" onclick="setSlot('${key}',false,this)">A</button>
+          </div>
+        </div>`;
+      }).join('')}
+      <div class="log-save-row">
+        <button class="btn btn-primary" style="width:100%" onclick="saveLog('${date}')">Save Attendance</button>
+      </div>
+    </div>`;
+}
+
+function setSlot(key, val, btn) {
+  logState[key] = val;
+  const row = btn.closest('.toggle-row');
+  row.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('p-active','a-active'));
+  btn.classList.add(val ? 'p-active' : 'a-active');
+}
+
+async function saveLog(date) {
+  const slots = getSlots(date);
+
+  // Undo previous log if exists
+  if (logs[date]) {
+    const prev = logs[date];
+    const prevSlots = getSlots(date);
+    prevSlots.forEach((s,i) => {
+      const key = `${s.code}_${i}`;
+      attendance[s.code].total = Math.max(0, attendance[s.code].total - 1);
+      if (prev[key]) attendance[s.code].present = Math.max(0, attendance[s.code].present - 1);
+    });
+  }
+
+  // Apply new log
+  logs[date] = {};
+  slots.forEach((s,i) => {
+    const key = `${s.code}_${i}`;
+    const attended = logState[key] !== false;
+    logs[date][key] = attended;
+    attendance[s.code].total += 1;
+    if (attended) attendance[s.code].present += 1;
+  });
+
+  await saveToDB();
+  renderOverview();
+  renderHistory();
+  renderCalendar();
+  loadDayForLog(); // refresh to show "logged" state
+  showToast('Saved ✓', 'green');
+}
+
+function renderHistory() {
+  const ul = document.getElementById('log-history-list');
+  const entries = Object.keys(logs).sort((a,b) => b.localeCompare(a));
+  if (entries.length === 0) {
+    ul.innerHTML = '<div class="empty">No logs yet. Start logging daily!</div>';
+    return;
+  }
+  ul.innerHTML = entries.map(date => {
+    const log = logs[date];
+    const vals = Object.values(log);
+    const present = vals.filter(Boolean).length;
+    const total = vals.length;
+    return `
+    <div class="log-hist-item">
+      <div>
+        <div class="lhi-date">${date}</div>
+        <div class="lhi-summary">${present}/${total} attended</div>
+      </div>
+      <div class="lhi-actions">
+        <button class="btn btn-secondary btn-sm" onclick="reloadLog('${date}')">Edit</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteLog('${date}')">Del</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function reloadLog(date) {
+  document.getElementById('log-date').value = date;
+  switchTab('log');
+  loadDayForLog();
+}
+
+async function deleteLog(date) {
+  if (!confirm(`Delete log for ${date}?`)) return;
+  const oldLog = logs[date];
+  const slots = getSlots(date);
+  slots.forEach((s,i) => {
+    const key = `${s.code}_${i}`;
+    attendance[s.code].total = Math.max(0, attendance[s.code].total - 1);
+    if (oldLog && oldLog[key]) attendance[s.code].present = Math.max(0, attendance[s.code].present - 1);
+  });
+  delete logs[date];
+  await saveToDB();
+  renderOverview();
+  renderHistory();
+  renderCalendar();
+  showToast('Deleted', 'red');
+}
+
+// ══════════════════════════════════════════════════
+// CALENDAR
+// ══════════════════════════════════════════════════
+function renderCalendar() {
+  const today = todayStr();
+  let html = '';
+  const months = [
+    { year: 2025, month: 1, label: 'February 2025' },
+    { year: 2025, month: 2, label: 'March 2025' },
+  ];
+  const heads = ['S','M','T','W','T','F','S'];
+
+  months.forEach(({ year, month, label }) => {
+    html += `<div class="cal-month-title">${label}</div>`;
+    html += `<div class="cal-grid">`;
+    heads.forEach(h => html += `<div class="cal-head">${h}</div>`);
+
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+    for (let i = 0; i < firstDay; i++) html += `<div class="cal-cell empty"></div>`;
+
+    for (let d = 1; d <= daysInMonth; d++) {
+      const ds = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+      const dow = new Date(ds+'T00:00:00').getDay();
+      const isWknd = dow === 0 || dow === 6;
+      const isHol = HOLIDAYS.has(ds);
+      const isLog = !!logs[ds];
+      const isToday = ds === today;
+      const isPast = ds < today;
+
+      let cls = 'cal-cell';
+      if (isWknd) cls += ' weekend';
+      else if (isHol) cls += ' holiday';
+      else if (isLog) cls += ' logged';
+      if (isToday) cls += ' today';
+      else if (isPast && !isLog && !isWknd && !isHol && ds >= '2025-02-23') cls += ' past';
+
+      const slots = isWknd || isHol ? [] : getSlots(ds);
+      const uniqueCodes = [...new Set(slots.map(s => s.code))].slice(0,4);
+      const dots = uniqueCodes.map(code => {
+        const v = pct(attendance[code]?.present||0, attendance[code]?.total||1);
+        const col = v>=80?'var(--green)':v>=75?'var(--yellow)':'var(--red)';
+        return `<span class="cal-dot" style="background:${col}"></span>`;
+      }).join('');
+
+      html += `
+        <div class="${cls}">
+          <div class="cal-num">${d}</div>
+          ${isHol ? '<div style="font-size:0.5rem;color:var(--red)">Off</div>' : ''}
+          <div class="cal-dot-row">${dots}</div>
+        </div>`;
+    }
+    html += `</div><div class="divider"></div>`;
+  });
+
+  document.getElementById('cal-content').innerHTML = html;
+}
+
+// ══════════════════════════════════════════════════
+// TIMETABLE
+// ══════════════════════════════════════════════════
+function renderTimetable() {
+  const days = ['Mon','Tue','Wed','Thu','Fri'];
+  document.getElementById('tt-day-headers').innerHTML = days.map(d =>
+    `<div class="tt-day-hdr">${d}</div>`).join('');
+
+  let html = '';
+  ALL_TIMES.forEach(time => {
+    html += `<div class="tt-time-label">${time}</div><div class="tt-day-row">`;
+    for (let day = 1; day <= 5; day++) {
+      const slot = TT.find(t => t.day === day && t.time === time);
+      if (!slot) {
+        html += `<div class="tt-cell empty-cell"><div class="tt-cell-name" style="color:var(--txt3);font-size:0.65rem">—</div></div>`;
+      } else {
+        const subj = INITIAL.find(s => s.code === slot.code);
+        html += `
+          <div class="tt-cell ${subj?.type||'lecture'}">
+            <div class="tt-cell-name">${subj?.name||slot.code}</div>
+            <div>
+              <div class="tt-cell-code">${slot.code}</div>
+              <div class="tt-cell-room">📍 ${slot.room}</div>
+            </div>
+          </div>`;
+      }
+    }
+    html += '</div>';
+  });
+  document.getElementById('tt-content').innerHTML = html;
+}
+
+// ══════════════════════════════════════════════════
+// TABS
+// ══════════════════════════════════════════════════
+function switchTab(tab) {
+  document.querySelectorAll('.nav-btn').forEach((b,i) => {
+    b.classList.toggle('active', ['overview','estimator','log','calendar','timetable'][i] === tab);
+  });
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-'+tab).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+// ══════════════════════════════════════════════════
+// TOAST
+// ══════════════════════════════════════════════════
+let toastTimer;
+function showToast(msg, type='') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + type + ' show';
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ══════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════
+async function init() {
+  initLog();
+  initAttendance(); // base state before DB load
+  renderAll();      // render with base data while loading
+  await initDB();   // then load from DB and re-render
+}
+
+init();
+</script>
+</body>
+</html>
