@@ -377,7 +377,7 @@ let estMode='attend', attendDates=[], bunkEntries=[], logState={};
 /* ─── HELPERS ─── */
 const pct=(p,t)=>t?(p/t)*100:0;
 const fmt=(p,t)=>pct(p,t).toFixed(2)+'%';
-const today=()=>new Date().toISOString().split('T')[0];
+const today=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;};
 const sname=c=>(SUBJECTS.find(s=>s.code===c)||{}).name||c;
 const stype=c=>(SUBJECTS.find(s=>s.code===c)||{}).type||'lecture';
 const dname=ds=>['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][new Date(ds+'T00:00:00').getDay()];
