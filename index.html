@@ -98,12 +98,15 @@ option{background:var(--s2)}
 
 /* OVERVIEW */
 .ov-hero{background:var(--s1);border:1px solid var(--bd);border-radius:var(--rad);padding:1.1rem 1.15rem;margin-bottom:.85rem}
-.ov-row{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;margin-bottom:.85rem}
+.ov-row{display:flex;flex-direction:column;gap:.75rem;margin-bottom:.0rem}
+.ov-top{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem}
 .ov-lbl{font-size:.65rem;color:var(--tx2);font-weight:600;margin-bottom:.2rem;text-transform:uppercase;letter-spacing:.06em}
 .ov-pct{font-family:'JetBrains Mono',monospace;font-size:2.3rem;font-weight:500;line-height:1}
 .ov-sub{font-size:.68rem;color:var(--tx3);margin-top:.22rem}
-.ov-bar-wrap{flex:1;padding-top:.45rem}
+.ov-bar-wrap{width:100%}
 .ov-markers{display:flex;justify-content:space-between;font-size:.58rem;color:var(--tx3);margin-top:.28rem}
+.ov-markers-wrap{position:relative;width:100%}
+.ov-marker-line{position:absolute;top:-9px;width:1px;height:6px;background:currentColor;opacity:.5}
 .sg{display:grid;grid-template-columns:repeat(4,1fr);gap:.45rem;margin-bottom:.9rem}
 @media(max-width:400px){.sg{grid-template-columns:repeat(2,1fr)}}
 .sc{background:var(--s1);border:1px solid var(--bd);border-radius:var(--rad);padding:.7rem;text-align:center}
@@ -154,6 +157,7 @@ option{background:var(--s2)}
 .cec.past{opacity:.3;cursor:default}
 .cec.sel-full{background:var(--pbg);border-color:var(--pbd);color:var(--p)}
 .cec.sel-partial{background:var(--ybg);border-color:var(--ybd);color:var(--y)}
+.cec.sel-skip{background:var(--rbg);border-color:var(--rbd);color:var(--r)}
 .cec:not(.emp):not(.wknd):not(.hol):not(.past):hover{border-color:var(--bd2)}
 .cecn{font-family:'JetBrains Mono',monospace;font-size:.64rem;line-height:1}
 .cec-slots{font-size:.48rem;color:inherit;margin-top:2px;opacity:.75}
@@ -281,10 +285,10 @@ option{background:var(--s2)}
     <div class="login-logo">Bunk<em>Meter</em></div>
     <div class="login-sub">Track attendance, estimate bunks,<br>stay above 75%.</div>
     <label class="login-label">Your Roll Number</label>
-    <input class="login-input" id="roll-input" type="text" placeholder="e.g. 19ECE001" maxlength="12" autocomplete="off" autocapitalize="characters" oninput="this.value=this.value.toUpperCase()" onkeydown="if(event.key==='Enter')doLogin()">
-    <div class="login-err" id="login-err">Enter a valid roll number</div>
+    <input class="login-input" id="roll-input" type="text" placeholder="e.g. 2023000810" maxlength="10" autocomplete="off" autocapitalize="characters" oninput="this.value=this.value.toUpperCase()" onkeydown="if(event.key==='Enter')doLogin()">
+    <div class="login-err" id="login-err">Enter a valid CSBS roll number (format: 2023XXXXXX)</div>
     <button class="login-btn" onclick="doLogin()">Continue →</button>
-    <div class="login-hint">Your data is saved separately by roll number.<br>Share this app with friends — each gets their own data.</div>
+    <div class="login-hint">For CSBS batch only · Format: 2023XXXXXX<br>Your data is saved separately per roll number.</div>
   </div>
 </div>
 
@@ -361,9 +365,10 @@ option{background:var(--s2)}
   <!-- MODE C: CALENDAR PICKER -->
   <div id="panelC" style="display:none">
     <div class="cal-est-legend">
-      <div class="cel-i"><div class="cel-b" style="background:var(--pbg);border-color:var(--pbd)"></div>Full attend</div>
-      <div class="cel-i"><div class="cel-b" style="background:var(--ybg);border-color:var(--ybd)"></div>Partial skip</div>
-      <div class="cel-i"><div class="cel-b" style="background:var(--rbg);border-color:var(--rbd)"></div>Full skip</div>
+      <div class="cel-i"><div class="cel-b" style="background:var(--pbg);border-color:var(--pbd)"></div>Tap 1× — Full attend</div>
+      <div class="cel-i"><div class="cel-b" style="background:var(--ybg);border-color:var(--ybd)"></div>Tap 2× — Pick classes</div>
+      <div class="cel-i"><div class="cel-b" style="background:var(--rbg);border-color:var(--rbd)"></div>Tap 3× — Full absent</div>
+      <div class="cel-i"><div class="cel-b" style="background:var(--s2);border-color:var(--bd)"></div>Tap 4× — Clear</div>
     </div>
     <div id="cal-est-body"></div>
     <div id="skip-pickers"></div>
@@ -547,9 +552,11 @@ function mustAtt(code){const a=ATT[code];if(!a)return 0;if(pct(a.present,a.total
 /* ── LOGIN ── */
 function doLogin(){
   const roll=document.getElementById('roll-input').value.trim().toUpperCase();
-  if(roll.length<4){document.getElementById('login-err').style.display='block';return;}
+  if(!/^2023\d{6}$/.test(roll)){document.getElementById('login-err').style.display='block';return;}
   document.getElementById('login-err').style.display='none';
   currentRoll=roll;
+  // Reset state completely before loading new user's data
+  ATT={};LOGS={};semEnd=DEFAULT_SEM_END;
   localStorage.setItem('bm_roll',roll);
   document.getElementById('login-screen').style.display='none';
   document.getElementById('user-chip').textContent=roll;
@@ -565,6 +572,7 @@ function checkAutoLogin(){
   const saved=localStorage.getItem('bm_roll');
   if(saved){
     currentRoll=saved;
+    ATT={};LOGS={};semEnd=DEFAULT_SEM_END;
     document.getElementById('roll-input').value=saved;
     document.getElementById('login-screen').style.display='none';
     document.getElementById('user-chip').textContent=saved;
@@ -638,14 +646,22 @@ function renderOV(){
   const{p,t}=overallAtt();const v=pct(p,t);const col=colVar(p,t);
   document.getElementById('ov-hero').innerHTML=`
     <div class="ov-row">
-      <div>
-        <div class="ov-lbl">Overall Attendance</div>
-        <div class="ov-pct mono" style="color:${col}">${v.toFixed(2)}%</div>
-        <div class="ov-sub">${p} present · ${t} total</div>
+      <div class="ov-top">
+        <div>
+          <div class="ov-lbl">Overall Attendance</div>
+          <div class="ov-pct mono" style="color:${col}">${v.toFixed(2)}%</div>
+          <div class="ov-sub">${p} present · ${t} total</div>
+        </div>
+        <span class="tag" style="background:${col==='var(--g)'?'var(--gbg)':col==='var(--y)'?'var(--ybg)':col==='var(--o)'?'var(--obg)':'var(--rbg)'};color:${col};border:1px solid ${col==='var(--g)'?'var(--gbd)':col==='var(--y)'?'var(--ybd)':col==='var(--o)'?'var(--obd)':'var(--rbd)'};">${v>=80?'Safe ✓':v>=75?'OK':v>=65?'Warning':'Critical'}</span>
       </div>
       <div class="ov-bar-wrap">
-        <div class="btrack" style="height:7px"><div class="bfill" style="width:${Math.min(v,100)}%;background:${col}"></div></div>
-        <div class="ov-markers"><span>0</span><span style="color:var(--r)">65</span><span style="color:var(--y)">75</span><span style="color:var(--g)">80</span><span>100</span></div>
+        <div class="btrack" style="height:8px;position:relative">
+          <div class="bfill" style="width:${Math.min(v,100)}%;background:${col}"></div>
+          <div style="position:absolute;top:0;left:65%;width:1px;height:100%;background:var(--r);opacity:.5"></div>
+          <div style="position:absolute;top:0;left:75%;width:1px;height:100%;background:var(--y);opacity:.5"></div>
+          <div style="position:absolute;top:0;left:80%;width:1px;height:100%;background:var(--g);opacity:.5"></div>
+        </div>
+        <div class="ov-markers"><span>0%</span><span style="color:var(--r)">65%</span><span style="color:var(--y)">75%</span><span style="color:var(--g)">80%</span><span>100%</span></div>
       </div>
     </div>`;
   const s80=SUBJECTS.filter(s=>pct(ATT[s.code]?.present||0,ATT[s.code]?.total||1)>=80).length;
@@ -763,8 +779,8 @@ function renderCalEst(){
       let cls='cec';
       if(st==='full')cls+=' sel-full';
       else if(st==='partial')cls+=' sel-partial';
-      else if(st==='skip')cls+=' sel-full';// skip all = red not shown, handled diff
-      html+=`<div class="${cls}" onclick="toggleCalDay('${ds}')"><div class="cecn">${d}</div><div class="cec-slots">${slots.length}p</div></div>`;
+      else if(st==='skip')cls+=' sel-skip';
+      html+=`<div class="${cls}" onclick="toggleCalDay('${ds}')"><div class="cecn">${d}</div><div class="cec-slots">${st==='full'?'✓ attend':st==='partial'?'partial':st==='skip'?'✗ skip':slots.length+'p'}</div></div>`;
     }
     html+=`</div>`;
   });
@@ -776,9 +792,10 @@ function renderCalEst(){
 
 function toggleCalDay(ds){
   const cur=calEstState[ds]||'none';
-  // cycle: none → full(attend) → partial(pick classes) → none
+  // cycle: none → full attend(purple) → partial skip(yellow) → full skip/absent(red) → none
   if(cur==='none'){calEstState[ds]='full';}
   else if(cur==='full'){calEstState[ds]='partial';if(!calEstState[ds+'_skips'])calEstState[ds+'_skips']=new Set();}
+  else if(cur==='partial'){calEstState[ds]='skip';delete calEstState[ds+'_skips'];}
   else{delete calEstState[ds];delete calEstState[ds+'_skips'];}
   renderCalEst();
 }
@@ -819,9 +836,11 @@ function runCalEst(){
     const skips=calEstState[ds+'_skips']||new Set();
     slots.forEach(sl=>{
       proj[sl.code].total++;
-      const isSkipped=st==='partial'?skips.has(sl.code):false;
-      // 'full' = attend all, 'partial' = skip chosen ones
-      if(!isSkipped)proj[sl.code].present++;
+      let isAbsent=false;
+      if(st==='skip') isAbsent=true; // full day absent
+      else if(st==='partial') isAbsent=skips.has(sl.code); // only skipped ones
+      // 'full' = attend all
+      if(!isAbsent) proj[sl.code].present++;
       else bset.add(`${ds}|${sl.code}`);
       aff.add(sl.code);
     });
