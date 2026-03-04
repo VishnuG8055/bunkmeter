@@ -5,22 +5,21 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>BunkMeter</title>
 <link rel="icon" type="image/png" sizes="32x32" href="assets/icon.png">
-<link rel="icon" type="image/x-icon" href="assets/icon.png">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/icon.png">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root {
-  --bg:#08080b; --s1:#0f0f14; --s2:#161620; --s3:#1e1e2a; --s4:#252533;
-  --bd:#2a2a3c; --bd2:#383850;
-  --tx:#ededf5; --tx2:#9898b8; --tx3:#55556e;
-  --g:#22d473; --gbg:rgba(34,212,115,.09); --gbd:rgba(34,212,115,.22);
-  --y:#f5c518; --ybg:rgba(245,197,24,.09); --ybd:rgba(245,197,24,.22);
-  --o:#f97316; --obg:rgba(249,115,22,.09); --obd:rgba(249,115,22,.22);
-  --r:#f04444; --rbg:rgba(240,68,68,.09); --rbd:rgba(240,68,68,.22);
-  --b:#4f8ef7; --bbg:rgba(79,142,247,.09); --bbd:rgba(79,142,247,.22);
-  --p:#a78bfa; --pbg:rgba(167,139,250,.09); --pbd:rgba(167,139,250,.22);
-  --rad:10px; --rad-s:6px; --rad-xs:4px;
+:root{
+  --bg:#08080b;--s1:#0f0f14;--s2:#161620;--s3:#1e1e2a;--s4:#252533;
+  --bd:#2a2a3c;--bd2:#383850;
+  --tx:#ededf5;--tx2:#9898b8;--tx3:#55556e;
+  --g:#22d473;--gbg:rgba(34,212,115,.09);--gbd:rgba(34,212,115,.22);
+  --y:#f5c518;--ybg:rgba(245,197,24,.09);--ybd:rgba(245,197,24,.22);
+  --o:#f97316;--obg:rgba(249,115,22,.09);--obd:rgba(249,115,22,.22);
+  --r:#f04444;--rbg:rgba(240,68,68,.09);--rbd:rgba(240,68,68,.22);
+  --b:#4f8ef7;--bbg:rgba(79,142,247,.09);--bbd:rgba(79,142,247,.22);
+  --p:#a78bfa;--pbg:rgba(167,139,250,.09);--pbd:rgba(167,139,250,.22);
+  --rad:10px;--rad-s:6px;--rad-xs:4px;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
@@ -29,17 +28,40 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--tx);min-he
 ::-webkit-scrollbar{width:3px;height:3px}
 ::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:2px}
 .app{display:flex;flex-direction:column;min-height:100dvh}
-.hdr{position:sticky;top:0;z-index:300;height:52px;padding:0 1rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;background:rgba(8,8,11,.95);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-bottom:1px solid var(--bd)}
+
+/* LOGIN SCREEN */
+.login-screen{position:fixed;inset:0;background:var(--bg);z-index:500;display:flex;align-items:center;justify-content:center;padding:1.5rem}
+.login-box{width:100%;max-width:380px}
+.login-logo{font-size:2rem;font-weight:800;letter-spacing:-.04em;margin-bottom:.4rem}
+.login-logo em{color:var(--p);font-style:normal}
+.login-sub{font-size:.82rem;color:var(--tx3);margin-bottom:2rem;line-height:1.5}
+.login-label{font-size:.65rem;font-weight:700;letter-spacing:.06em;color:var(--tx3);text-transform:uppercase;margin-bottom:.35rem;display:block}
+.login-input{width:100%;background:var(--s2);border:1px solid var(--bd);color:var(--tx);padding:.7rem .9rem;border-radius:var(--rad-s);font-family:'JetBrains Mono',monospace;font-size:1rem;outline:none;transition:border-color .18s;letter-spacing:.08em}
+.login-input:focus{border-color:var(--p)}
+.login-btn{width:100%;margin-top:.75rem;padding:.7rem;background:var(--p);color:#000;font-family:'Outfit',sans-serif;font-weight:800;font-size:.9rem;border:none;border-radius:var(--rad-s);cursor:pointer;transition:opacity .15s}
+.login-btn:hover{opacity:.85}
+.login-err{font-size:.75rem;color:var(--r);margin-top:.5rem;display:none}
+.login-hint{font-size:.7rem;color:var(--tx3);margin-top:1.2rem;text-align:center;line-height:1.6}
+
+/* HEADER */
+.hdr{position:sticky;top:0;z-index:300;height:52px;padding:0 1rem;display:flex;align-items:center;justify-content:space-between;gap:.5rem;background:rgba(8,8,11,.95);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-bottom:1px solid var(--bd)}
 .logo{font-size:1.05rem;font-weight:800;letter-spacing:-.04em}
 .logo em{color:var(--p);font-style:normal}
+.hdr-right{display:flex;align-items:center;gap:.6rem}
+.user-chip{font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--tx2);background:var(--s2);border:1px solid var(--bd);border-radius:50px;padding:.18rem .6rem;cursor:pointer}
+.user-chip:hover{border-color:var(--bd2)}
 .sync{display:flex;align-items:center;gap:.35rem;font-size:.68rem;color:var(--tx3)}
 .dot{width:5px;height:5px;border-radius:50%;background:var(--tx3);flex-shrink:0;transition:background .3s}
 .dot.ok{background:var(--g)}.dot.err{background:var(--r)}.dot.load{background:var(--y)}
+
+/* NAV */
 .nav{display:flex;overflow-x:auto;scrollbar-width:none;background:var(--s1);border-bottom:1px solid var(--bd);position:sticky;top:52px;z-index:200}
 .nav::-webkit-scrollbar{display:none}
 .nb{flex-shrink:0;height:42px;padding:0 1.05rem;border:none;background:transparent;color:var(--tx3);font-family:'Outfit',sans-serif;font-size:.79rem;font-weight:600;cursor:pointer;border-bottom:2px solid transparent;transition:color .18s,border-color .18s;white-space:nowrap}
 .nb.on{color:var(--tx);border-bottom-color:var(--p)}
 .nb:hover:not(.on){color:var(--tx2)}
+
+/* PAGES */
 .pg{display:none;padding:1.1rem 1rem;max-width:860px;margin:0 auto;width:100%}
 .pg.on{display:block}
 .sec{font-size:.63rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--tx3);margin-bottom:.7rem}
@@ -48,8 +70,8 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--tx);min-he
 .empty{text-align:center;padding:2.5rem 1rem;color:var(--tx3);font-size:.85rem;line-height:1.7}
 .fg{display:flex;flex-direction:column;gap:.32rem}
 .fl{font-size:.65rem;font-weight:700;letter-spacing:.06em;color:var(--tx3);text-transform:uppercase}
-input[type="date"],select{background:var(--s2);border:1px solid var(--bd);color:var(--tx);padding:.52rem .7rem;border-radius:var(--rad-s);font-family:'Outfit',sans-serif;font-size:.84rem;outline:none;width:100%;transition:border-color .18s;-webkit-appearance:none;appearance:none}
-input[type="date"]:focus,select:focus{border-color:var(--p)}
+input[type="date"],input[type="text"],input[type="number"],select{background:var(--s2);border:1px solid var(--bd);color:var(--tx);padding:.52rem .7rem;border-radius:var(--rad-s);font-family:'Outfit',sans-serif;font-size:.84rem;outline:none;width:100%;transition:border-color .18s;-webkit-appearance:none;appearance:none}
+input[type="date"]:focus,input[type="text"]:focus,input[type="number"]:focus,select:focus{border-color:var(--p)}
 option{background:var(--s2)}
 .frow{display:flex;gap:.5rem;align-items:flex-end;flex-wrap:wrap}
 .btn{padding:.52rem .95rem;border:none;border-radius:var(--rad-s);font-family:'Outfit',sans-serif;font-weight:700;font-size:.81rem;cursor:pointer;transition:opacity .15s,transform .1s;white-space:nowrap}
@@ -57,6 +79,7 @@ option{background:var(--s2)}
 .btn-p{background:var(--p);color:#000}.btn-p:hover{opacity:.85}
 .btn-s{background:var(--s3);color:var(--tx);border:1px solid var(--bd)}.btn-s:hover{border-color:var(--bd2)}
 .btn-d{background:var(--rbg);color:var(--r);border:1px solid var(--rbd)}
+.btn-g{background:var(--gbg);color:var(--g);border:1px solid var(--gbd)}
 .btn-sm{padding:.32rem .65rem;font-size:.7rem}
 .btn-full{width:100%}
 .tag{font-size:.62rem;font-weight:700;padding:.17rem .48rem;border-radius:var(--rad-xs);white-space:nowrap;display:inline-block}
@@ -99,8 +122,8 @@ option{background:var(--s2)}
 .sj-bunks{display:flex;gap:.3rem;flex-wrap:wrap;margin-top:.45rem}
 
 /* ESTIMATOR */
-.mode-row{display:flex;gap:.4rem;margin-bottom:.9rem}
-.mbtn{flex:1;padding:.5rem;border:1px solid var(--bd);border-radius:var(--rad-s);background:var(--s2);color:var(--tx2);font-family:'Outfit',sans-serif;font-size:.77rem;font-weight:600;cursor:pointer;transition:all .18s;text-align:center}
+.mode-row{display:flex;gap:.4rem;margin-bottom:.9rem;flex-wrap:wrap}
+.mbtn{flex:1;min-width:120px;padding:.5rem;border:1px solid var(--bd);border-radius:var(--rad-s);background:var(--s2);color:var(--tx2);font-family:'Outfit',sans-serif;font-size:.77rem;font-weight:600;cursor:pointer;transition:all .18s;text-align:center}
 .mbtn.on{background:var(--pbg);border-color:var(--pbd);color:var(--p)}
 .est-panel{background:var(--s1);border:1px solid var(--bd);border-radius:var(--rad);padding:1rem;margin-bottom:.7rem}
 .chip{display:flex;align-items:center;gap:.5rem;background:var(--s2);border:1px solid var(--bd);border-radius:var(--rad-s);padding:.48rem .7rem;margin-bottom:.38rem}
@@ -122,7 +145,37 @@ option{background:var(--s2)}
 .esr-old{font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--tx3);text-decoration:line-through}
 .esr-new{font-family:'JetBrains Mono',monospace;font-size:1rem;font-weight:500}
 
+/* CAL ESTIMATOR */
+.cal-est-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:.75rem}
+.cec{border-radius:5px;border:1px solid var(--bd);padding:.3rem .1rem;display:flex;flex-direction:column;align-items:center;font-size:.68rem;font-weight:600;min-height:46px;background:var(--s1);color:var(--tx2);cursor:pointer;transition:all .15s;user-select:none}
+.cec.emp{background:transparent;border-color:transparent;cursor:default}
+.cec.wknd{opacity:.28;cursor:default}
+.cec.hol{background:var(--rbg);border-color:var(--rbd);color:var(--r);cursor:default}
+.cec.past{opacity:.3;cursor:default}
+.cec.sel-full{background:var(--pbg);border-color:var(--pbd);color:var(--p)}
+.cec.sel-partial{background:var(--ybg);border-color:var(--ybd);color:var(--y)}
+.cec:not(.emp):not(.wknd):not(.hol):not(.past):hover{border-color:var(--bd2)}
+.cecn{font-family:'JetBrains Mono',monospace;font-size:.64rem;line-height:1}
+.cec-slots{font-size:.48rem;color:inherit;margin-top:2px;opacity:.75}
+.cal-est-legend{display:flex;gap:.7rem;flex-wrap:wrap;font-size:.67rem;color:var(--tx3);margin-bottom:.85rem}
+.cel-i{display:flex;align-items:center;gap:.3rem}
+.cel-b{width:8px;height:8px;border-radius:2px;border:1px solid}
+/* Subject skip picker */
+.skip-picker{background:var(--s1);border:1px solid var(--ybd);border-radius:var(--rad);padding:.85rem 1rem;margin-bottom:.5rem}
+.skip-picker-date{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--y);margin-bottom:.6rem;font-weight:600}
+.skip-subj-row{display:flex;align-items:center;justify-content:space-between;padding:.4rem 0;border-bottom:1px solid var(--bd)}
+.skip-subj-row:last-child{border-bottom:none}
+.skip-subj-name{font-size:.8rem;font-weight:600;flex:1}
+.skip-subj-code{font-family:'JetBrains Mono',monospace;font-size:.56rem;color:var(--tx3)}
+.skip-tog{display:flex;border:1px solid var(--bd);border-radius:var(--rad-s);overflow:hidden;flex-shrink:0}
+.skip-tb{padding:.28rem .6rem;border:none;background:transparent;font-family:'Outfit',sans-serif;font-size:.7rem;font-weight:700;cursor:pointer;transition:background .15s,color .15s;color:var(--tx3)}
+.skip-tb.att{background:var(--gbg);color:var(--g)}
+.skip-tb.skip{background:var(--rbg);color:var(--r)}
+
 /* LOG */
+.log-mode-row{display:flex;gap:.4rem;margin-bottom:.85rem}
+.lmbtn{flex:1;padding:.42rem .5rem;border:1px solid var(--bd);border-radius:var(--rad-s);background:var(--s2);color:var(--tx2);font-family:'Outfit',sans-serif;font-size:.75rem;font-weight:600;cursor:pointer;transition:all .15s;text-align:center}
+.lmbtn.on{background:var(--pbg);border-color:var(--pbd);color:var(--p)}
 .log-ctrl{background:var(--s1);border:1px solid var(--bd);border-radius:var(--rad);padding:.9rem 1rem;margin-bottom:.7rem}
 .log-card{background:var(--s1);border:1px solid var(--bd);border-radius:var(--rad);overflow:hidden;margin-bottom:.7rem}
 .log-card-hdr{padding:.65rem 1rem;border-bottom:1px solid var(--bd);background:var(--s2);display:flex;align-items:center;justify-content:space-between}
@@ -144,6 +197,16 @@ option{background:var(--s2)}
 .hi-sum{font-size:.73rem;color:var(--tx2)}
 .hi-acts{display:flex;gap:.32rem;flex-shrink:0}
 
+/* BULK LOG */
+.bulk-row{display:flex;align-items:center;padding:.55rem 0;border-bottom:1px solid var(--bd);gap:.6rem}
+.bulk-row:last-child{border-bottom:none}
+.bulk-info{flex:1;min-width:0}
+.bulk-name{font-size:.82rem;font-weight:600}
+.bulk-code{font-family:'JetBrains Mono',monospace;font-size:.56rem;color:var(--tx3)}
+.bulk-inputs{display:flex;align-items:center;gap:.35rem;flex-shrink:0}
+.bulk-inp{width:52px;text-align:center;padding:.35rem .4rem;font-family:'JetBrains Mono',monospace;font-size:.82rem}
+.bulk-sep{font-size:.75rem;color:var(--tx3);font-weight:700}
+
 /* CALENDAR */
 .cal-mhdr{font-weight:800;font-size:.93rem;margin-bottom:.6rem;margin-top:.2rem}
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:1.15rem}
@@ -156,7 +219,7 @@ option{background:var(--s2)}
 .cc.today{border-color:var(--p);color:var(--tx)}
 .cc.past:not(.logged):not(.hol):not(.wknd){opacity:.42}
 .ccn{font-family:'JetBrains Mono',monospace;font-size:.66rem;line-height:1;margin-bottom:1px}
-.cch{font-size:.4rem;color:var(--r);text-align:center;line-height:1.2;margin-top:1px;padding:0 1px;word-break:break-word;max-width:100%}
+.cch{font-size:.4rem;color:var(--r);text-align:center;line-height:1.2;margin-top:1px;padding:0 1px;word-break:break-word}
 .ccd{display:flex;gap:1px;flex-wrap:wrap;justify-content:center;margin-top:2px}
 .cd{width:3px;height:3px;border-radius:50%}
 .cal-legend{display:flex;gap:.85rem;flex-wrap:wrap;font-size:.68rem;color:var(--tx3);margin-top:.5rem}
@@ -180,9 +243,10 @@ option{background:var(--s2)}
 .tt-cn{font-size:.7rem;font-weight:700;line-height:1.3;color:var(--tx);margin-bottom:.2rem}
 .tt-cc{font-family:'JetBrains Mono',monospace;font-size:.54rem;color:var(--tx3);margin-bottom:.25rem}
 .tt-dot{width:6px;height:6px;border-radius:50%;display:inline-block;margin:0 auto}
-/* Mobile */
-.tt-mobile{display:none;flex-direction:column;gap:.5rem}
-@media(max-width:560px){.tt-wrap{display:none}.tt-mobile{display:flex}}
+.tt-mobile{display:grid;grid-template-columns:1fr;gap:.6rem}
+.tt-wrap{display:none}
+@media(min-width:600px){.tt-mobile{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:860px){.tt-mobile{grid-template-columns:repeat(3,1fr)}}
 .tt-day-block{background:var(--s1);border:1px solid var(--bd);border-radius:var(--rad);overflow:hidden}
 .tt-day-hdr{padding:.6rem 1rem;background:var(--s2);border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between}
 .tt-day-hdr-name{font-size:.85rem;font-weight:700}
@@ -199,20 +263,46 @@ option{background:var(--s2)}
 .tt-mob-badge{font-size:.58rem;font-weight:700;padding:.13rem .4rem;border-radius:var(--rad-xs)}
 .tt-mob-pct{font-family:'JetBrains Mono',monospace;font-size:.65rem;font-weight:500;display:flex;align-items:center;gap:.3rem}
 .att-dot{width:6px;height:6px;border-radius:50%;display:inline-block;flex-shrink:0}
+
+/* SETTINGS */
+.settings-card{background:var(--s1);border:1px solid var(--bd);border-radius:var(--rad);padding:1rem;margin-bottom:.7rem}
+.settings-row{display:flex;align-items:center;justify-content:space-between;padding:.5rem 0;border-bottom:1px solid var(--bd);gap:1rem}
+.settings-row:last-child{border-bottom:none}
+.settings-lbl{font-size:.83rem;font-weight:600}
+.settings-sub{font-size:.7rem;color:var(--tx3);margin-top:.1rem}
 </style>
 </head>
 <body>
 <div class="app">
+
+<!-- LOGIN -->
+<div class="login-screen" id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">Bunk<em>Meter</em></div>
+    <div class="login-sub">Track attendance, estimate bunks,<br>stay above 75%.</div>
+    <label class="login-label">Your Roll Number</label>
+    <input class="login-input" id="roll-input" type="text" placeholder="e.g. 19ECE001" maxlength="12" autocomplete="off" autocapitalize="characters" oninput="this.value=this.value.toUpperCase()" onkeydown="if(event.key==='Enter')doLogin()">
+    <div class="login-err" id="login-err">Enter a valid roll number</div>
+    <button class="login-btn" onclick="doLogin()">Continue →</button>
+    <div class="login-hint">Your data is saved separately by roll number.<br>Share this app with friends — each gets their own data.</div>
+  </div>
+</div>
+
 <header class="hdr">
   <div class="logo">Bunk<em>Meter</em></div>
-  <div class="sync"><div class="dot load" id="sdot"></div><span id="slbl">connecting…</span></div>
+  <div class="hdr-right">
+    <div class="user-chip" id="user-chip" onclick="tab('settings')" title="Settings"></div>
+    <div class="sync"><div class="dot load" id="sdot"></div><span id="slbl">connecting…</span></div>
+  </div>
 </header>
+
 <nav class="nav">
   <button class="nb on" onclick="tab('overview')">Overview</button>
   <button class="nb" onclick="tab('estimator')">Estimator</button>
   <button class="nb" onclick="tab('log')">Log</button>
   <button class="nb" onclick="tab('calendar')">Calendar</button>
   <button class="nb" onclick="tab('timetable')">Timetable</button>
+  <button class="nb" onclick="tab('settings')">Settings</button>
 </nav>
 
 <!-- OVERVIEW -->
@@ -229,14 +319,16 @@ option{background:var(--s2)}
 <!-- ESTIMATOR -->
 <div class="pg" id="pg-estimator">
   <div class="mode-row">
-    <button class="mbtn on" id="mA" onclick="setMode('attend')">Attend full day(s)</button>
-    <button class="mbtn" id="mB" onclick="setMode('bunk')">Skip specific classes</button>
+    <button class="mbtn on" id="mA" onclick="setMode('attend')">📅 Attend full day(s)</button>
+    <button class="mbtn" id="mB" onclick="setMode('bunk')">🚫 Skip specific classes</button>
+    <button class="mbtn" id="mC" onclick="setMode('cal')">🗓 Calendar picker</button>
   </div>
+  <!-- MODE A -->
   <div id="panelA">
     <div class="est-panel">
       <div class="sec" style="margin-bottom:.6rem">Pick dates — see what happens if you attend everything</div>
       <div class="frow">
-        <div class="fg" style="flex:1"><label class="fl">Date</label><input type="date" id="ea-date" min="2026-02-23" max="2026-03-31"></div>
+        <div class="fg" style="flex:1"><label class="fl">Date</label><input type="date" id="ea-date" min="2026-02-23"></div>
         <button class="btn btn-s" onclick="addAttendDate()">+ Add</button>
       </div>
     </div>
@@ -248,11 +340,12 @@ option{background:var(--s2)}
       </div>
     </div>
   </div>
+  <!-- MODE B -->
   <div id="panelB" style="display:none">
     <div class="est-panel">
       <div class="sec" style="margin-bottom:.6rem">Pick classes to skip — only shows subjects scheduled that day</div>
       <div class="frow">
-        <div class="fg" style="flex:1;min-width:120px"><label class="fl">Date</label><input type="date" id="eb-date" min="2026-02-23" max="2026-03-31" onchange="refreshBSubjects()"></div>
+        <div class="fg" style="flex:1;min-width:120px"><label class="fl">Date</label><input type="date" id="eb-date" min="2026-02-23" onchange="refreshBSubjects()"></div>
         <div class="fg" style="flex:1.4;min-width:130px"><label class="fl">Subject (that day)</label><select id="eb-subj"><option value="">— pick date first —</option></select></div>
         <button class="btn btn-s" onclick="addBunkEntry()">+ Add</button>
       </div>
@@ -265,21 +358,52 @@ option{background:var(--s2)}
       </div>
     </div>
   </div>
+  <!-- MODE C: CALENDAR PICKER -->
+  <div id="panelC" style="display:none">
+    <div class="cal-est-legend">
+      <div class="cel-i"><div class="cel-b" style="background:var(--pbg);border-color:var(--pbd)"></div>Full attend</div>
+      <div class="cel-i"><div class="cel-b" style="background:var(--ybg);border-color:var(--ybd)"></div>Partial skip</div>
+      <div class="cel-i"><div class="cel-b" style="background:var(--rbg);border-color:var(--rbd)"></div>Full skip</div>
+    </div>
+    <div id="cal-est-body"></div>
+    <div id="skip-pickers"></div>
+    <div id="ec-act" style="display:none;margin-bottom:.75rem">
+      <div style="display:flex;gap:.45rem">
+        <button class="btn btn-p" onclick="runCalEst()">Estimate</button>
+        <button class="btn btn-s" onclick="clearC()">Clear</button>
+      </div>
+    </div>
+  </div>
   <div id="est-res"></div>
 </div>
 
 <!-- LOG -->
 <div class="pg" id="pg-log">
-  <div class="log-ctrl">
-    <div class="frow">
-      <div class="fg" style="flex:1"><label class="fl">Date (today or earlier only)</label><input type="date" id="log-date"></div>
-      <button class="btn btn-p" onclick="loadLog()">Load</button>
-    </div>
+  <div class="log-mode-row">
+    <button class="lmbtn on" id="lm-day" onclick="setLogMode('day')">Day-by-Day</button>
+    <button class="lmbtn" id="lm-bulk" onclick="setLogMode('bulk')">Bulk Entry</button>
   </div>
-  <div id="log-body"></div>
-  <div style="margin-top:1.25rem">
-    <div class="sec">History</div>
-    <div id="log-hist"></div>
+  <!-- DAY LOG -->
+  <div id="log-day-panel">
+    <div class="log-ctrl">
+      <div class="frow">
+        <div class="fg" style="flex:1"><label class="fl">Date (today or earlier)</label><input type="date" id="log-date"></div>
+        <button class="btn btn-p" onclick="loadLog()">Load</button>
+      </div>
+    </div>
+    <div id="log-body"></div>
+    <div style="margin-top:1.25rem"><div class="sec">History</div><div id="log-hist"></div></div>
+  </div>
+  <!-- BULK LOG -->
+  <div id="log-bulk-panel" style="display:none">
+    <div class="card" style="margin-bottom:.7rem">
+      <p style="font-size:.8rem;color:var(--tx2);line-height:1.6;margin-bottom:.75rem">Enter present and total classes for each subject. This <strong>replaces</strong> the current base values. Use this if you missed logging days.</p>
+      <div id="bulk-subj-list"></div>
+      <div style="margin-top:.85rem;display:flex;gap:.5rem">
+        <button class="btn btn-p" style="flex:1" onclick="saveBulk()">Save All</button>
+        <button class="btn btn-s" onclick="resetBulkInputs()">Reset</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -304,14 +428,44 @@ option{background:var(--s2)}
   <div class="tt-mobile" id="tt-mobile"></div>
 </div>
 
+<!-- SETTINGS -->
+<div class="pg" id="pg-settings">
+  <div class="sec">Account</div>
+  <div class="settings-card">
+    <div class="settings-row">
+      <div><div class="settings-lbl">Roll Number</div><div class="settings-sub" id="set-roll">—</div></div>
+      <button class="btn btn-d btn-sm" onclick="logout()">Switch</button>
+    </div>
+  </div>
+
+  <div class="sec">Semester</div>
+  <div class="settings-card">
+    <div class="settings-row">
+      <div><div class="settings-lbl">Semester End Date</div><div class="settings-sub">Last day classes can be logged</div></div>
+      <input type="date" id="sem-end-input" style="width:140px" onchange="saveSemEnd()">
+    </div>
+    <div class="settings-row">
+      <div><div class="settings-lbl">Holidays</div><div class="settings-sub" id="hol-list-disp"></div></div>
+    </div>
+  </div>
+
+  <div class="sec">Danger Zone</div>
+  <div class="settings-card">
+    <div class="settings-row">
+      <div><div class="settings-lbl">Reset All Attendance</div><div class="settings-sub">Clears all logs and resets to base values</div></div>
+      <button class="btn btn-d btn-sm" onclick="resetAll()">Reset</button>
+    </div>
+  </div>
+</div>
+
 </div>
 <div class="toast" id="toast"></div>
 
 <script>
-const SUPABASE_URL  = 'https://dzvnihxhakcggzhqgppr.supabase.co';
-const SUPABASE_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR6dm5paHhoYWtjZ2d6aHFncHByIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3NjcwMTUsImV4cCI6MjA4NzM0MzAxNX0.E8J5QnF_VH2YX_xQLiOtSKROJ8WtvZGHI3TLTgffNwQ';
+const SUPABASE_URL='https://dzvnihxhakcggzhqgppr.supabase.co';
+const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR6dm5paHhoYWtjZ2d6aHFncHByIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3NjcwMTUsImV4cCI6MjA4NzM0MzAxNX0.E8J5QnF_VH2YX_xQLiOtSKROJ8WtvZGHI3TLTgffNwQ';
 
-const SUBJECTS = [
+const SUBJECTS=[
   {code:'19ECB332',  name:'Computer Networks',          p:17,t:24,type:'lecture'},
   {code:'19ECB332P', name:'Computer Networks Lab',      p:22,t:28,type:'lab'},
   {code:'19ECB334',  name:'Information Security',       p:19,t:21,type:'lecture'},
@@ -326,7 +480,7 @@ const SUBJECTS = [
   {code:'24CSEN1081',name:'Intermediate Coding-II',     p:9, t:16,type:'lecture'},
   {code:'HSMCH102',  name:'Universal Human Values 2',   p:16,t:24,type:'lecture'},
 ];
-const TT = [
+const TT=[
   {day:1,slot:'08',time:'08:00–08:50',code:'19ECB334'},
   {day:1,slot:'09',time:'09:00–09:50',code:'19ECB346'},
   {day:1,slot:'10',time:'10:00–10:50',code:'19ECB332P'},
@@ -362,25 +516,64 @@ const TT = [
 ];
 const SLOTS=['08','09','10','11','13','14','15'];
 const SLOT_LBL={'08':'08:00–08:50','09':'09:00–09:50','10':'10:00–10:50','11':'11:00–11:50','13':'13:00–13:50','14':'14:00–14:50','15':'15:00–15:50'};
-const HOL={'2026-03-20':'Ugadi / Ramzan','2026-03-27':'Sri Rama Navami'};
+// Base holidays — user can see these in settings
+const BASE_HOL={'2026-03-19':'Ugadi','2026-03-20':'Ramzan','2026-04-03':'Good Friday'};
+// Semester info
+const SEM_START='2026-02-23';
+const SEM_CLASSWORK_END='2026-04-15'; // last day of classwork
+const DEFAULT_SEM_END='2026-04-15';
 
-let db=null,ATT={},LOGS={};
-let estMode='attend',attendDates=[],bunkEntries=[],logState={};
+/* ── STATE ── */
+let db=null,ATT={},LOGS={},currentRoll='',semEnd=DEFAULT_SEM_END;
+let estMode='attend',attendDates=[],bunkEntries=[],logState={},logMode='day';
+let calEstState={}; // ds -> 'full'|'partial'|'skip', partial has skipSet
 
+/* ── HELPERS ── */
 const pct=(p,t)=>t?(p/t)*100:0;
 const today=()=>{const d=new Date();return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`};
 const sname=c=>(SUBJECTS.find(s=>s.code===c)||{}).name||c;
 const dname=ds=>['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][new Date(ds+'T00:00:00').getDay()];
+const fmtDate=ds=>new Date(ds+'T00:00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short'});
 function colOf(p,t){const v=pct(p,t);if(v>=80)return'g';if(v>=75)return'y';if(v>=65)return'o';return'r';}
 function colVar(p,t){return{g:'var(--g)',y:'var(--y)',o:'var(--o)',r:'var(--r)'}[colOf(p,t)];}
 function attDot(code){const a=ATT[code];if(!a)return'var(--tx3)';return colVar(a.present,a.total);}
 function attPct(code){const a=ATT[code];if(!a)return'—';return pct(a.present,a.total).toFixed(0)+'%';}
-function isHol(ds){if(HOL[ds])return true;const d=new Date(ds+'T00:00:00');return d.getDay()===0||d.getDay()===6;}
+function isHol(ds){if(BASE_HOL[ds])return true;const d=new Date(ds+'T00:00:00');return d.getDay()===0||d.getDay()===6;}
 function getSlots(ds){if(isHol(ds))return[];const dow=new Date(ds+'T00:00:00').getDay();return TT.filter(t=>t.day===dow);}
 function overallAtt(){let p=0,t=0;SUBJECTS.forEach(s=>{const a=ATT[s.code];if(a){p+=a.present;t+=a.total;}});return{p,t};}
 function canBunk(code,thr){const a=ATT[code];if(!a)return 0;const x=(a.present-(thr/100)*a.total)/(thr/100);return Math.max(0,Math.floor(x));}
 function mustAtt(code){const a=ATT[code];if(!a)return 0;if(pct(a.present,a.total)>=75)return 0;return Math.ceil(Math.max(0,(0.75*a.total-a.present)/0.25));}
 
+/* ── LOGIN ── */
+function doLogin(){
+  const roll=document.getElementById('roll-input').value.trim().toUpperCase();
+  if(roll.length<4){document.getElementById('login-err').style.display='block';return;}
+  document.getElementById('login-err').style.display='none';
+  currentRoll=roll;
+  localStorage.setItem('bm_roll',roll);
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('user-chip').textContent=roll;
+  document.getElementById('set-roll').textContent=roll;
+  initATT();initDB();
+}
+function logout(){
+  if(!confirm('Switch account? You will need to enter your roll number again.'))return;
+  localStorage.removeItem('bm_roll');
+  location.reload();
+}
+function checkAutoLogin(){
+  const saved=localStorage.getItem('bm_roll');
+  if(saved){
+    currentRoll=saved;
+    document.getElementById('roll-input').value=saved;
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('user-chip').textContent=saved;
+    document.getElementById('set-roll').textContent=saved;
+    initATT();initDB();
+  }
+}
+
+/* ── DB ── */
 function initATT(){SUBJECTS.forEach(s=>{ATT[s.code]={present:s.p,total:s.t};});}
 function setSS(st,lbl){document.getElementById('sdot').className='dot '+st;document.getElementById('slbl').textContent=lbl;}
 async function initDB(){
@@ -388,22 +581,57 @@ async function initDB(){
   try{
     if(!SUPABASE_URL||!SUPABASE_KEY)throw'no config';
     db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-    const{data,error}=await db.from('bunkmeter_data').select('*').eq('id',1).single();
-    if(error||!data){await db.from('bunkmeter_data').upsert({id:1,attendance:ATT,logs:LOGS,updated_at:new Date().toISOString()});}
-    else{ATT=data.attendance;LOGS=data.logs||{};}
+    const{data,error}=await db.from('bunkmeter_data').select('*').eq('roll',currentRoll).single();
+    if(error||!data){
+      await db.from('bunkmeter_data').upsert({roll:currentRoll,attendance:ATT,logs:LOGS,sem_end:semEnd,updated_at:new Date().toISOString()});
+    } else {
+      ATT=data.attendance||{};LOGS=data.logs||{};
+      semEnd=data.sem_end||DEFAULT_SEM_END;
+      if(!Object.keys(ATT).length)initATT();
+    }
     setSS('ok','synced');
   }catch(e){setSS('err','offline');loadLocal();}
-  renderAll();
+  renderAll();initLogDate();initSemSettings();
 }
 async function save(){
-  if(db){try{await db.from('bunkmeter_data').upsert({id:1,attendance:ATT,logs:LOGS,updated_at:new Date().toISOString()});setSS('ok','saved ✓');setTimeout(()=>setSS('ok','synced'),2000);}catch(e){setSS('err','sync failed');saveLocal();}}
-  else saveLocal();
+  if(db){
+    try{
+      await db.from('bunkmeter_data').upsert({roll:currentRoll,attendance:ATT,logs:LOGS,sem_end:semEnd,updated_at:new Date().toISOString()});
+      setSS('ok','saved ✓');setTimeout(()=>setSS('ok','synced'),2000);
+    }catch(e){setSS('err','sync failed');saveLocal();}
+  } else saveLocal();
 }
-function saveLocal(){try{localStorage.setItem('bm',JSON.stringify({ATT,LOGS}));}catch(e){}}
-function loadLocal(){try{const d=JSON.parse(localStorage.getItem('bm')||'null');if(d){ATT=d.ATT||{};LOGS=d.LOGS||{};}}catch(e){initATT();}}
+function saveLocal(){try{localStorage.setItem('bm_'+currentRoll,JSON.stringify({ATT,LOGS,semEnd}));}catch(e){}}
+function loadLocal(){
+  try{
+    const d=JSON.parse(localStorage.getItem('bm_'+currentRoll)||'null');
+    if(d){ATT=d.ATT||{};LOGS=d.LOGS||{};semEnd=d.semEnd||DEFAULT_SEM_END;if(!Object.keys(ATT).length)initATT();}
+  }catch(e){initATT();}
+}
 
-function renderAll(){renderOV();renderHist();renderCal();renderTT();}
+/* ── SETTINGS ── */
+function initSemSettings(){
+  const el=document.getElementById('sem-end-input');
+  el.value=semEnd;el.min=SEM_START;el.max='2026-06-30';
+  // holidays list
+  const hols=Object.entries(BASE_HOL).map(([d,n])=>`${fmtDate(d)} – ${n}`).join(' · ');
+  document.getElementById('hol-list-disp').textContent=hols+' · (weekends auto)';
+  // update estimator date maxes
+  ['ea-date','eb-date'].forEach(id=>{const el=document.getElementById(id);if(el)el.max=semEnd;});
+}
+async function saveSemEnd(){
+  semEnd=document.getElementById('sem-end-input').value||DEFAULT_SEM_END;
+  initSemSettings();renderCal();await save();showToast('Semester end updated','tg');
+}
+async function resetAll(){
+  if(!confirm('Reset all attendance data to default values? This cannot be undone.'))return;
+  initATT();LOGS={};await save();renderAll();showToast('Reset done','tg');
+}
 
+/* ── RENDER ALL ── */
+function renderAll(){renderOV();renderHist();renderCal();renderTT();renderBulkList();}
+
+/* ── OVERVIEW ── */
 function renderOV(){
   document.getElementById('ov-spin').style.display='none';
   document.getElementById('ov-body').style.display='block';
@@ -446,17 +674,23 @@ function renderOV(){
   }).join('');
 }
 
+/* ── ESTIMATOR ── */
 function setMode(m){
   estMode=m;
+  ['A','B','C'].forEach(x=>document.getElementById('m'+x).classList.toggle('on',m===x.toLowerCase().replace('a','attend').replace('b','bunk').replace('c','cal')));
   document.getElementById('mA').classList.toggle('on',m==='attend');
   document.getElementById('mB').classList.toggle('on',m==='bunk');
+  document.getElementById('mC').classList.toggle('on',m==='cal');
   document.getElementById('panelA').style.display=m==='attend'?'block':'none';
   document.getElementById('panelB').style.display=m==='bunk'?'block':'none';
+  document.getElementById('panelC').style.display=m==='cal'?'block':'none';
   document.getElementById('est-res').innerHTML='';
+  if(m==='cal')renderCalEst();
 }
+
+// Mode A
 function addAttendDate(){
-  const ds=document.getElementById('ea-date').value;
-  if(!ds)return;
+  const ds=document.getElementById('ea-date').value;if(!ds)return;
   if(isHol(ds)){showToast('Holiday — no classes','tr');return;}
   if(attendDates.includes(ds)){showToast('Already added','tr');return;}
   if(!getSlots(ds).length){showToast('No classes on that day','tr');return;}
@@ -477,8 +711,10 @@ function runAttendAll(){
   attendDates.forEach(ds=>getSlots(ds).forEach(sl=>{proj[sl.code].present++;proj[sl.code].total++;aff.add(sl.code);}));
   showRes(proj,aff,'attend',attendDates,null);
 }
+
+// Mode B
 function refreshBSubjects(){
-  const ds=document.getElementById('eb-date').value;const sel=document.getElementById('eb-subj');
+  const ds=document.getElementById('eb-date').value,sel=document.getElementById('eb-subj');
   if(!ds||isHol(ds)){sel.innerHTML='<option value="">— pick a valid date first —</option>';return;}
   const slots=getSlots(ds);if(!slots.length){sel.innerHTML='<option value="">No classes on this day</option>';return;}
   const u=[...new Map(slots.map(s=>[s.code,s])).values()];
@@ -506,13 +742,100 @@ function runBunkEst(){
   dates.forEach(ds=>getSlots(ds).forEach(sl=>{proj[sl.code].total++;if(!bset.has(`${ds}|${sl.code}`))proj[sl.code].present++;aff.add(sl.code);}));
   showRes(proj,aff,'bunk',dates,bset);
 }
+
+// Mode C — Calendar estimator
+function renderCalEst(){
+  const td=today();let html='';
+  [{y:2026,m:1,lbl:'February 2026'},{y:2026,m:2,lbl:'March 2026'},{y:2026,m:3,lbl:'April 2026'}].forEach(({y,m,lbl})=>{
+    html+=`<div class="cal-mhdr" style="font-size:.82rem;margin-bottom:.4rem">${lbl}</div><div class="cal-est-grid">`;
+    ['S','M','T','W','T','F','S'].forEach(d=>html+=`<div class="ch">${d}</div>`);
+    const first=new Date(y,m,1).getDay();const days=new Date(y,m+1,0).getDate();
+    for(let i=0;i<first;i++)html+=`<div class="cec emp"></div>`;
+    for(let d=1;d<=days;d++){
+      const ds=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+      if(ds<td||ds>semEnd){html+=`<div class="cec past"><div class="cecn">${d}</div></div>`;continue;}
+      const dow=new Date(ds+'T00:00:00').getDay();
+      const wknd=dow===0||dow===6;
+      if(wknd){html+=`<div class="cec wknd"><div class="cecn">${d}</div></div>`;continue;}
+      if(BASE_HOL[ds]){html+=`<div class="cec hol"><div class="cecn">${d}</div><div class="cec-slots">${BASE_HOL[ds].slice(0,4)}</div></div>`;continue;}
+      const slots=getSlots(ds);if(!slots.length){html+=`<div class="cec past"><div class="cecn">${d}</div></div>`;continue;}
+      const st=calEstState[ds]||'none';
+      let cls='cec';
+      if(st==='full')cls+=' sel-full';
+      else if(st==='partial')cls+=' sel-partial';
+      else if(st==='skip')cls+=' sel-full';// skip all = red not shown, handled diff
+      html+=`<div class="${cls}" onclick="toggleCalDay('${ds}')"><div class="cecn">${d}</div><div class="cec-slots">${slots.length}p</div></div>`;
+    }
+    html+=`</div>`;
+  });
+  document.getElementById('cal-est-body').innerHTML=html;
+  renderSkipPickers();
+  const hasSel=Object.keys(calEstState).length>0;
+  document.getElementById('ec-act').style.display=hasSel?'block':'none';
+}
+
+function toggleCalDay(ds){
+  const cur=calEstState[ds]||'none';
+  // cycle: none → full(attend) → partial(pick classes) → none
+  if(cur==='none'){calEstState[ds]='full';}
+  else if(cur==='full'){calEstState[ds]='partial';if(!calEstState[ds+'_skips'])calEstState[ds+'_skips']=new Set();}
+  else{delete calEstState[ds];delete calEstState[ds+'_skips'];}
+  renderCalEst();
+}
+function toggleSkipSubj(ds,code,btn){
+  if(!calEstState[ds+'_skips'])calEstState[ds+'_skips']=new Set();
+  const skips=calEstState[ds+'_skips'];
+  if(skips.has(code)){skips.delete(code);btn.classList.remove('skip');btn.classList.add('att');}
+  else{skips.add(code);btn.classList.remove('att');btn.classList.add('skip');}
+}
+function renderSkipPickers(){
+  const partialDays=Object.keys(calEstState).filter(k=>!k.includes('_skips')&&calEstState[k]==='partial').sort();
+  const el=document.getElementById('skip-pickers');
+  if(!partialDays.length){el.innerHTML='';return;}
+  el.innerHTML=partialDays.map(ds=>{
+    const slots=getSlots(ds);
+    const uniq=[...new Map(slots.map(s=>[s.code,s])).values()];
+    const skips=calEstState[ds+'_skips']||new Set();
+    return`<div class="skip-picker">
+      <div class="skip-picker-date">${ds} · ${dname(ds)} — pick classes to skip</div>
+      ${uniq.map(s=>`<div class="skip-subj-row">
+        <div><div class="skip-subj-name">${sname(s.code)}</div><div class="skip-subj-code">${s.code}</div></div>
+        <div class="skip-tog">
+          <button class="skip-tb ${skips.has(s.code)?'skip':'att'}" onclick="toggleSkipSubj('${ds}','${s.code}',this)">${skips.has(s.code)?'Skip':'Attend'}</button>
+        </div>
+      </div>`).join('')}
+    </div>`;
+  }).join('');
+}
+function clearC(){calEstState={};renderCalEst();document.getElementById('est-res').innerHTML='';}
+function runCalEst(){
+  const proj={};SUBJECTS.forEach(s=>{const a=ATT[s.code];proj[s.code]={present:a.present,total:a.total};});
+  const aff=new Set();
+  const days=Object.keys(calEstState).filter(k=>!k.includes('_skips')).sort();
+  const bset=new Set();
+  days.forEach(ds=>{
+    const st=calEstState[ds];
+    const slots=getSlots(ds);
+    const skips=calEstState[ds+'_skips']||new Set();
+    slots.forEach(sl=>{
+      proj[sl.code].total++;
+      const isSkipped=st==='partial'?skips.has(sl.code):false;
+      // 'full' = attend all, 'partial' = skip chosen ones
+      if(!isSkipped)proj[sl.code].present++;
+      else bset.add(`${ds}|${sl.code}`);
+      aff.add(sl.code);
+    });
+  });
+  showRes(proj,aff,'cal',days,bset);
+}
+
 function showRes(proj,aff,mode,dates,bset){
   let tp=0,tt=0;SUBJECTS.forEach(s=>{tp+=proj[s.code].present;tt+=proj[s.code].total;});
   const{p:cp,t:ct}=overallAtt();
   const ov=pct(tp,tt),ocol=colVar(tp,tt);
   const diff=ov-pct(cp,ct);
   const dtag=Math.abs(diff)<0.01?`<span class="tag tp">No change</span>`:diff>0?`<span class="tag tg">+${diff.toFixed(2)}%</span>`:`<span class="tag tr_">${diff.toFixed(2)}%</span>`;
-  const desc=mode==='attend'?`Attending all classes on ${dates.length} day${dates.length>1?'s':''}`:`Bunking ${bunkEntries.length} class${bunkEntries.length>1?'es':''} across ${dates.length} day${dates.length>1?'s':''}`;
+  const desc=mode==='attend'?`Attending all on ${dates.length} day${dates.length>1?'s':''}`:mode==='cal'?`Calendar plan — ${dates.length} day${dates.length>1?'s':''}`:`Skipping classes across ${dates.length} day${dates.length>1?'s':''}`;
   let html=`<div class="est-overall"><div><div class="eol-lbl">Projected Overall</div><div class="eol-val mono" style="color:${ocol}">${ov.toFixed(2)}%</div><div class="eol-sub">${desc} · was ${pct(cp,ct).toFixed(2)}%</div></div><div class="eor">${dtag}${ov<65?'<span class="tag tr_">Below 65%!</span>':ov<75?'<span class="tag to">Below 75%</span>':''}</div></div><div class="sec">Affected Subjects</div><div class="esr-list">`;
   [...aff].forEach(code=>{
     const a=ATT[code],pr=proj[code];
@@ -524,23 +847,32 @@ function showRes(proj,aff,mode,dates,bset){
   });
   html+='</div>';
   document.getElementById('est-res').innerHTML=html;
+  document.getElementById('est-res').scrollIntoView({behavior:'smooth',block:'nearest'});
 }
 
+/* ── LOG ── */
+function setLogMode(m){
+  logMode=m;
+  document.getElementById('lm-day').classList.toggle('on',m==='day');
+  document.getElementById('lm-bulk').classList.toggle('on',m==='bulk');
+  document.getElementById('log-day-panel').style.display=m==='day'?'block':'none';
+  document.getElementById('log-bulk-panel').style.display=m==='bulk'?'block':'none';
+}
 function initLogDate(){const el=document.getElementById('log-date');el.max=today();el.min='2026-01-01';el.value=today();}
 function loadLog(){
   const ds=document.getElementById('log-date').value;
   if(!ds){showToast('Pick a date','tr');return;}
   if(ds>today()){showToast('Cannot log future dates','tr');return;}
   const slots=getSlots(ds);const body=document.getElementById('log-body');
-  if(isHol(ds)){const hn=HOL[ds]||'Weekend';body.innerHTML=`<div class="card"><div class="empty">🎉 ${hn}<br>No classes today!</div></div>`;return;}
+  if(isHol(ds)){const hn=BASE_HOL[ds]||'Weekend';body.innerHTML=`<div class="card"><div class="empty">🎉 ${hn}<br>No classes today!</div></div>`;return;}
   if(!slots.length){body.innerHTML=`<div class="card"><div class="empty">No classes scheduled</div></div>`;return;}
   const existing=LOGS[ds]||{};logState={};
   slots.forEach((s,i)=>{const key=`${s.code}_${i}`;logState[key]=existing[key]!==undefined?existing[key]:true;});
   const editing=!!LOGS[ds];
   body.innerHTML=`<div class="log-card">
-    <div class="log-card-hdr"><div><div class="lcd">${ds} · ${dname(ds)}</div><div class="lcm">${slots.length} periods${editing?' · <span style="color:var(--g)">✓ previously logged — editing</span>':''}</div></div></div>
+    <div class="log-card-hdr"><div><div class="lcd">${ds} · ${dname(ds)}</div><div class="lcm">${slots.length} periods${editing?' · <span style="color:var(--g)">✓ editing</span>':''}</div></div></div>
     ${slots.map((s,i)=>{const key=`${s.code}_${i}`;const isP=logState[key];return`<div class="lp"><div class="lp-info"><div class="lp-time">${s.time}</div><div class="lp-name">${sname(s.code)}</div><div class="lp-code">${s.code}</div></div><div class="tog"><button class="tb ${isP?'pa':''}" onclick="setSlot('${key}',true,this)">P</button><button class="tb ${!isP?'aa':''}" onclick="setSlot('${key}',false,this)">A</button></div></div>`;}).join('')}
-    <div class="log-save-bar"><button class="btn btn-p btn-full" onclick="doSaveLog('${ds}')">${editing?'Update Attendance':'Save Attendance'}</button></div>
+    <div class="log-save-bar"><button class="btn btn-p btn-full" onclick="doSaveLog('${ds}')">${editing?'Update':'Save'} Attendance</button></div>
   </div>`;
 }
 function setSlot(key,val,btn){logState[key]=val;const row=btn.closest('.tog');row.querySelectorAll('.tb').forEach(b=>b.classList.remove('pa','aa'));btn.classList.add(val?'pa':'aa');}
@@ -557,7 +889,7 @@ function renderHist(){
   if(!keys.length){ul.innerHTML='<div class="empty">No logs yet.<br>Start from today!</div>';return;}
   ul.innerHTML=keys.map(ds=>{const log=LOGS[ds];const pres=Object.values(log).filter(Boolean).length;const tot=Object.values(log).length;return`<div class="hist-item"><div><div class="hi-date">${ds} · ${dname(ds)}</div><div class="hi-sum">${pres}/${tot} attended</div></div><div class="hi-acts"><button class="btn btn-s btn-sm" onclick="editLog('${ds}')">Edit</button><button class="btn btn-d btn-sm" onclick="delLog('${ds}')">Del</button></div></div>`;}).join('');
 }
-function editLog(ds){document.getElementById('log-date').value=ds;tab('log');loadLog();window.scrollTo(0,0);}
+function editLog(ds){document.getElementById('log-date').value=ds;setLogMode('day');tab('log');loadLog();window.scrollTo(0,0);}
 async function delLog(ds){
   if(!confirm(`Delete log for ${ds}?`))return;
   const prev=LOGS[ds];const slots=getSlots(ds);
@@ -565,9 +897,42 @@ async function delLog(ds){
   delete LOGS[ds];await save();renderOV();renderHist();renderCal();showToast('Deleted','tr');
 }
 
+/* ── BULK LOG ── */
+function renderBulkList(){
+  document.getElementById('bulk-subj-list').innerHTML=SUBJECTS.map(s=>{
+    const a=ATT[s.code]||{present:s.p,total:s.t};
+    return`<div class="bulk-row">
+      <div class="bulk-info"><div class="bulk-name">${s.name}</div><div class="bulk-code">${s.code}</div></div>
+      <div class="bulk-inputs">
+        <input type="number" class="bulk-inp" id="bp_${s.code}" value="${a.present}" min="0" max="999" placeholder="P">
+        <span class="bulk-sep">/</span>
+        <input type="number" class="bulk-inp" id="bt_${s.code}" value="${a.total}" min="0" max="999" placeholder="T">
+      </div>
+    </div>`;
+  }).join('');
+}
+async function saveBulk(){
+  let valid=true;
+  SUBJECTS.forEach(s=>{
+    const p=parseInt(document.getElementById('bp_'+s.code).value)||0;
+    const t=parseInt(document.getElementById('bt_'+s.code).value)||0;
+    if(p>t){valid=false;showToast(`${s.code}: present > total!`,'tr');}
+  });
+  if(!valid)return;
+  SUBJECTS.forEach(s=>{
+    ATT[s.code]={
+      present:parseInt(document.getElementById('bp_'+s.code).value)||0,
+      total:parseInt(document.getElementById('bt_'+s.code).value)||0
+    };
+  });
+  await save();renderOV();renderTT();showToast('Bulk data saved ✓','tg');
+}
+function resetBulkInputs(){SUBJECTS.forEach(s=>{document.getElementById('bp_'+s.code).value=ATT[s.code]?.present||0;document.getElementById('bt_'+s.code).value=ATT[s.code]?.total||0;});}
+
+/* ── CALENDAR ── */
 function renderCal(){
   const td=today();let html='';
-  [{y:2026,m:1,lbl:'February 2026'},{y:2026,m:2,lbl:'March 2026'}].forEach(({y,m,lbl})=>{
+  [{y:2026,m:1,lbl:'February 2026'},{y:2026,m:2,lbl:'March 2026'},{y:2026,m:3,lbl:'April 2026'}].forEach(({y,m,lbl})=>{
     html+=`<div class="cal-mhdr">${lbl}</div><div class="cal-grid">`;
     ['S','M','T','W','T','F','S'].forEach(d=>html+=`<div class="ch">${d}</div>`);
     const first=new Date(y,m,1).getDay();const days=new Date(y,m+1,0).getDate();
@@ -575,12 +940,13 @@ function renderCal(){
     for(let d=1;d<=days;d++){
       const ds=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
       const dow=new Date(ds+'T00:00:00').getDay();
-      const wknd=dow===0||dow===6,hol=!!HOL[ds],logged=!!LOGS[ds],isT=ds===td,past=ds<td;
+      const wknd=dow===0||dow===6,hol=!!BASE_HOL[ds],logged=!!LOGS[ds],isT=ds===td,past=ds<td,beyond=ds>semEnd;
       let cls='cc';
       if(wknd)cls+=' wknd';else if(hol)cls+=' hol';else if(logged)cls+=' logged';
-      if(isT)cls+=' today';else if(past&&!logged&&!wknd&&!hol&&ds>='2026-02-23')cls+=' past';
-      const hname=HOL[ds]||'';
-      const hshort=hname==='Ugadi / Ramzan'?'Ugadi':hname==='Sri Rama Navami'?'Rama Nav.':'';
+      if(isT)cls+=' today';else if(past&&!logged&&!wknd&&!hol&&ds>=SEM_START)cls+=' past';
+      if(beyond&&!isT)cls=cls.replace(' logged','');
+      const hname=BASE_HOL[ds]||'';
+      const hshort=hname.length>8?hname.slice(0,7)+'…':hname;
       const sl=wknd||hol?[]:getSlots(ds);
       const noDotsZone=ds>='2026-02-02'&&ds<='2026-02-20';
       const dots=noDotsZone?'':[...new Set(sl.map(s=>s.code))].slice(0,5).map(code=>{
@@ -588,16 +954,16 @@ function renderCal(){
         const c=v>=80?'var(--g)':v>=75?'var(--y)':v>=65?'var(--o)':'var(--r)';
         return`<span class="cd" style="background:${c}"></span>`;
       }).join('');
-      html+=`<div class="${cls}"><div class="ccn">${d}</div>${hol?`<div class="cch">${hshort}</div>`:''}<div class="ccd">${dots}</div></div>`;
+      html+=`<div class="${cls}"><div class="ccn">${d}</div>${hol?`<div class="cch">${hshort}</div>`:beyond?`<div class="cch" style="color:var(--tx3)">end</div>`:''}<div class="ccd">${dots}</div></div>`;
     }
     html+=`</div><div class="divider"></div>`;
   });
   document.getElementById('cal-body').innerHTML=html;
 }
 
+/* ── TIMETABLE ── */
 function renderTT(){
   const days=['Mon','Tue','Wed','Thu','Fri'];
-  // Desktop table
   let html=`<thead><tr><th class="tt-th" style="min-width:72px;text-align:left;padding-left:.6rem;background:transparent;border-color:transparent;color:var(--tx3);font-size:.6rem">TIME</th>${days.map(d=>`<th class="tt-th">${d}</th>`).join('')}</tr></thead><tbody>`;
   SLOTS.forEach(slot=>{
     const [start,end]=SLOT_LBL[slot].split('–');
@@ -608,56 +974,44 @@ function renderTT(){
       else{
         const sub=SUBJECTS.find(x=>x.code===s.code);
         const dotCol=attDot(s.code);
-        html+=`<td class="tt-c ${sub?.type||'lecture'}">
-          <div class="tt-cn">${sub?.name||s.code}</div>
-          <div class="tt-cc">${s.code}</div>
-          <span class="tt-dot" style="background:${dotCol}" title="${attPct(s.code)}"></span>
-        </td>`;
+        html+=`<td class="tt-c ${sub?.type||'lecture'}"><div class="tt-cn">${sub?.name||s.code}</div><div class="tt-cc">${s.code}</div><span class="tt-dot" style="background:${dotCol}" title="${attPct(s.code)}"></span></td>`;
       }
     }
     html+='</tr>';
   });
   html+='</tbody>';
   document.getElementById('tt-tbl').innerHTML=html;
-
-  // Mobile cards
   const dayNames=['Monday','Tuesday','Wednesday','Thursday','Friday'];
   let mhtml='';
   for(let day=1;day<=5;day++){
     const daySlots=TT.filter(t=>t.day===day).sort((a,b)=>a.slot.localeCompare(b.slot));
     mhtml+=`<div class="tt-day-block"><div class="tt-day-hdr"><div class="tt-day-hdr-name">${dayNames[day-1]}</div><div class="tt-day-hdr-count">${daySlots.length} periods</div></div>`;
     daySlots.forEach(s=>{
-      const sub=SUBJECTS.find(x=>x.code===s.code);
-      const type=sub?.type||'lecture';
-      const dotCol=attDot(s.code);
-      const pctVal=attPct(s.code);
-      const badge=type==='lab'
-        ?`<span class="tt-mob-badge" style="background:rgba(79,142,247,.1);color:var(--b);border:1px solid rgba(79,142,247,.25)">Lab</span>`
-        :`<span class="tt-mob-badge" style="background:rgba(245,197,24,.1);color:var(--y);border:1px solid rgba(245,197,24,.25)">Lec</span>`;
-      mhtml+=`<div class="tt-mob-row ${type}-row">
-        <div class="tt-mob-time">${s.time.replace('–','–<br>')}</div>
-        <div class="tt-mob-info"><div class="tt-mob-name">${sub?.name||s.code}</div><div class="tt-mob-code">${s.code}</div></div>
-        <div class="tt-mob-right">
-          ${badge}
-          <div class="tt-mob-pct"><span class="att-dot" style="background:${dotCol}"></span><span style="color:${dotCol}">${pctVal}</span></div>
-        </div>
-      </div>`;
+      const sub=SUBJECTS.find(x=>x.code===s.code);const type=sub?.type||'lecture';
+      const dotCol=attDot(s.code);const pctVal=attPct(s.code);
+      const badge=type==='lab'?`<span class="tt-mob-badge" style="background:rgba(79,142,247,.1);color:var(--b);border:1px solid rgba(79,142,247,.25)">Lab</span>`:`<span class="tt-mob-badge" style="background:rgba(245,197,24,.1);color:var(--y);border:1px solid rgba(245,197,24,.25)">Lec</span>`;
+      mhtml+=`<div class="tt-mob-row ${type}-row"><div class="tt-mob-time">${s.time.replace('–','–<br>')}</div><div class="tt-mob-info"><div class="tt-mob-name">${sub?.name||s.code}</div><div class="tt-mob-code">${s.code}</div></div><div class="tt-mob-right">${badge}<div class="tt-mob-pct"><span class="att-dot" style="background:${dotCol}"></span><span style="color:${dotCol}">${pctVal}</span></div></div></div>`;
     });
     mhtml+='</div>';
   }
   document.getElementById('tt-mobile').innerHTML=mhtml;
 }
 
+/* ── TABS ── */
 function tab(id){
-  const IDS=['overview','estimator','log','calendar','timetable'];
+  const IDS=['overview','estimator','log','calendar','timetable','settings'];
   document.querySelectorAll('.nb').forEach((b,i)=>b.classList.toggle('on',IDS[i]===id));
   document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
   document.getElementById('pg-'+id).classList.add('on');
   window.scrollTo(0,0);
 }
+
+/* ── TOAST ── */
 let _tt;
 function showToast(msg,cls=''){const el=document.getElementById('toast');el.textContent=msg;el.className='toast '+cls+' show';clearTimeout(_tt);_tt=setTimeout(()=>el.classList.remove('show'),2400);}
-async function init(){initATT();initLogDate();renderAll();await initDB();}
+
+/* ── INIT ── */
+async function init(){checkAutoLogin();}
 init();
 </script>
 </body>
