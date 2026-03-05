@@ -356,9 +356,9 @@ option{background:var(--s2)}
 <!-- ESTIMATOR -->
 <div class="pg" id="pg-estimator">
   <div class="mode-row">
+    <button class="mbtn" id="mC" onclick="setMode('cal')">Calendar picker</button>
     <button class="mbtn on" id="mA" onclick="setMode('attend')">Attend full day(s)</button>
     <button class="mbtn" id="mB" onclick="setMode('bunk')">Skip specific classes</button>
-    <button class="mbtn" id="mC" onclick="setMode('cal')">Calendar picker</button>
   </div>
   <!-- MODE A -->
   <div id="panelA">
@@ -419,9 +419,9 @@ option{background:var(--s2)}
 <!-- LOG -->
 <div class="pg" id="pg-log">
   <div class="log-mode-row">
-    <button class="lmbtn on" id="lm-day" onclick="setLogMode('day')">Day-by-Day</button>
     <button class="lmbtn" id="lm-bulk" onclick="setLogMode('bulk')">Bulk Entry</button>
     <button class="lmbtn" id="lm-paste" onclick="setLogMode('paste')">Paste Portal</button>
+    <button class="lmbtn on" id="lm-day" onclick="setLogMode('day')">Day-by-Day</button>
   </div>
   <!-- DAY LOG -->
   <div id="log-day-panel">
