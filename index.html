@@ -598,7 +598,7 @@ function checkAutoLogin(){
 }
 
 /* ── DB ── */
-function initATT(){SUBJECTS.forEach(s=>{ATT[s.code]={present:s.p,total:s.t};});}
+function initATT(){SUBJECTS.forEach(s=>{ATT[s.code]={present:0,total:0};});}
 function setSS(st,lbl){document.getElementById('sdot').className='dot '+st;document.getElementById('slbl').textContent=lbl;}
 async function initDB(){
   setSS('load','connecting…');
