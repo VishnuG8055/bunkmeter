@@ -163,8 +163,8 @@ option{background:var(--s2)}
 .cec-slots{font-size:.48rem;color:inherit;margin-top:2px;opacity:.75}
 .cal-est-legend{display:grid;grid-template-columns:1fr 1fr;gap:.4rem;margin-bottom:.9rem}
 @media(min-width:500px){.cal-est-legend{grid-template-columns:repeat(4,1fr)}}
-.cel-i{display:flex;align-items:center;gap:.45rem;background:var(--s2);border:1px solid var(--bd);border-radius:var(--rad-s);padding:.42rem .6rem;font-size:.69rem;font-weight:600;color:var(--tx2)}
-.cel-num{font-family:'JetBrains Mono',monospace;font-size:.65rem;font-weight:700;width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.cel-i{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.3rem;background:var(--s2);border:1px solid var(--bd);border-radius:var(--rad-s);padding:.55rem .4rem;font-size:.69rem;font-weight:600;color:var(--tx2);text-align:center}
+.cel-num{font-family:'JetBrains Mono',monospace;font-size:.72rem;font-weight:800;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 /* Subject skip picker */
 .skip-picker{background:var(--s1);border:1px solid var(--ybd);border-radius:var(--rad);padding:.85rem 1rem;margin-bottom:.5rem}
 .skip-picker-date{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--y);margin-bottom:.6rem;font-weight:600}
@@ -324,9 +324,9 @@ option{background:var(--s2)}
 <!-- ESTIMATOR -->
 <div class="pg" id="pg-estimator">
   <div class="mode-row">
-    <button class="mbtn on" id="mA" onclick="setMode('attend')">📅 Attend full day(s)</button>
-    <button class="mbtn" id="mB" onclick="setMode('bunk')">🚫 Skip specific classes</button>
-    <button class="mbtn" id="mC" onclick="setMode('cal')">🗓 Calendar picker</button>
+    <button class="mbtn on" id="mA" onclick="setMode('attend')">Attend full day(s)</button>
+    <button class="mbtn" id="mB" onclick="setMode('bunk')">Skip specific classes</button>
+    <button class="mbtn" id="mC" onclick="setMode('cal')">Calendar picker</button>
   </div>
   <!-- MODE A -->
   <div id="panelA">
@@ -365,11 +365,12 @@ option{background:var(--s2)}
   </div>
   <!-- MODE C: CALENDAR PICKER -->
   <div id="panelC" style="display:none">
+    <div style="font-size:.72rem;color:var(--tx3);margin-bottom:.45rem;font-weight:600">Tap a date to cycle through states:</div>
     <div class="cal-est-legend">
-      <div class="cel-i"><div class="cel-num" style="background:var(--pbg);color:var(--p);border:1px solid var(--pbd)">1</div><span>Full attend</span></div>
-      <div class="cel-i"><div class="cel-num" style="background:var(--ybg);color:var(--y);border:1px solid var(--ybd)">2</div><span>Pick classes</span></div>
-      <div class="cel-i"><div class="cel-num" style="background:var(--rbg);color:var(--r);border:1px solid var(--rbd)">3</div><span>Full absent</span></div>
-      <div class="cel-i"><div class="cel-num" style="background:var(--s3);color:var(--tx3);border:1px solid var(--bd)">4</div><span>Clear</span></div>
+      <div class="cel-i"><div class="cel-num" style="background:var(--pbg);color:var(--p);border:1px solid var(--pbd)">1×</div><span>Full attend</span></div>
+      <div class="cel-i"><div class="cel-num" style="background:var(--ybg);color:var(--y);border:1px solid var(--ybd)">2×</div><span>Pick classes</span></div>
+      <div class="cel-i"><div class="cel-num" style="background:var(--rbg);color:var(--r);border:1px solid var(--rbd)">3×</div><span>Full absent</span></div>
+      <div class="cel-i"><div class="cel-num" style="background:var(--s3);color:var(--tx3);border:1px solid var(--bd)">4×</div><span>Clear</span></div>
     </div>
     <div id="cal-est-body"></div>
     <div id="skip-pickers"></div>
@@ -388,7 +389,7 @@ option{background:var(--s2)}
   <div class="log-mode-row">
     <button class="lmbtn on" id="lm-day" onclick="setLogMode('day')">Day-by-Day</button>
     <button class="lmbtn" id="lm-bulk" onclick="setLogMode('bulk')">Bulk Entry</button>
-    <button class="lmbtn" id="lm-paste" onclick="setLogMode('paste')">📋 Paste Portal</button>
+    <button class="lmbtn" id="lm-paste" onclick="setLogMode('paste')">Paste Bulk Entry</button>
   </div>
   <!-- DAY LOG -->
   <div id="log-day-panel">
@@ -416,10 +417,10 @@ option{background:var(--s2)}
   <div id="log-paste-panel" style="display:none">
     <div class="card" style="margin-bottom:.7rem">
       <div style="font-size:.82rem;font-weight:700;margin-bottom:.3rem">Paste from College Portal</div>
-      <p style="font-size:.76rem;color:var(--tx2);line-height:1.6;margin-bottom:.75rem">Go to your college portal → Attendance page → select all the table rows → copy (Ctrl+C) → paste below.</p>
+      <p style="font-size:.76rem;color:var(--tx2);line-height:1.6;margin-bottom:.75rem">Go to G-Learn→ Attendance page → select all the table rows → copy (Ctrl+C) → paste below.</p>
       <textarea id="paste-input" style="width:100%;background:var(--s2);border:1px solid var(--bd);color:var(--tx);padding:.65rem .8rem;border-radius:var(--rad-s);font-family:'JetBrains Mono',monospace;font-size:.72rem;resize:vertical;min-height:130px;outline:none;transition:border-color .18s;line-height:1.5" placeholder="Paste copied attendance table here…" oninput="parsePaste()"></textarea>
       <div id="paste-preview" style="margin-top:.7rem"></div>
-      <div id="paste-act" style="display:none;margin-top:.7rem;display:flex;gap:.5rem;flex-wrap:wrap">
+      <div id="paste-act" style="margin-top:.7rem;gap:.5rem;flex-wrap:wrap;display:none">
         <button class="btn btn-p" style="flex:1" onclick="applyPaste()">Apply to BunkMeter</button>
         <button class="btn btn-s" onclick="clearPaste()">Clear</button>
       </div>
@@ -576,7 +577,7 @@ function doLogin(){
   document.getElementById('login-screen').style.display='none';
   document.getElementById('user-chip').textContent=roll;
   document.getElementById('set-roll').textContent=roll;
-  initATT();initDB();
+  initATT();initLogDate();initDB();
 }
 function logout(){
   if(!confirm('Switch account? You will need to enter your roll number again.'))return;
@@ -592,7 +593,7 @@ function checkAutoLogin(){
     document.getElementById('login-screen').style.display='none';
     document.getElementById('user-chip').textContent=saved;
     document.getElementById('set-roll').textContent=saved;
-    initATT();initDB();
+    initATT();initLogDate();initDB();
   }
 }
 
@@ -887,10 +888,13 @@ function showRes(proj,aff,mode,dates,bset){
 /* ── LOG ── */
 function setLogMode(m){
   logMode=m;
-  document.getElementById('lm-day').classList.toggle('on',m==='day');
-  document.getElementById('lm-bulk').classList.toggle('on',m==='bulk');
+  ['day','bulk','paste'].forEach(x=>{
+    const b=document.getElementById('lm-'+x);if(b)b.classList.toggle('on',m===x);
+  });
   document.getElementById('log-day-panel').style.display=m==='day'?'block':'none';
   document.getElementById('log-bulk-panel').style.display=m==='bulk'?'block':'none';
+  const pp=document.getElementById('log-paste-panel');if(pp)pp.style.display=m==='paste'?'block':'none';
+  if(m==='day' && document.getElementById('log-date').value) loadLog();
 }
 function initLogDate(){const el=document.getElementById('log-date');el.max=today();el.min='2026-01-01';el.value=today();}
 function loadLog(){
