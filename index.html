@@ -28,9 +28,26 @@
 }
 body.light{
   --bg:#f0f0f5;--s1:#ffffff;--s2:#f5f5fa;--s3:#ebebf5;--s4:#e0e0ee;
-  --bd:#d0d0e0;--bd2:#b8b8d0;
-  --tx:#111118;--tx2:#44445a;--tx3:#88889a;
+  --bd:#c8c8d8;--bd2:#a0a0b8;
+  --tx:#0a0a12;--tx2:#2a2a40;--tx3:#52526a;
 }
+body.light .sec{color:#3a3a55}
+body.light .fl{color:#3a3a55}
+body.light .sj-code,body.light .bulk-code,body.light .lp-code,body.light .tt-cc{color:#4a4a62}
+body.light .nb{color:#4a4a62}
+body.light .nb.on{color:#0a0a12}
+body.light .ov-lbl{color:#2a2a40}
+body.light .ov-sub{color:#4a4a62}
+body.light .scl{color:#4a4a62}
+body.light .eol-lbl,body.light .eol-sub{color:#4a4a62}
+body.light .sync{color:#4a4a62}
+body.light .user-chip{color:#2a2a40;background:#ebebf5;border-color:#c8c8d8}
+body.light .tt-time{color:#4a4a62}
+body.light .settings-sub{color:#4a4a62}
+body.light .hi-sum{color:#2a2a40}
+body.light .chip-sub{color:#4a4a62}
+body.light .lcm{color:#4a4a62}
+body.light .lp-time{color:#4a4a62}
 body.light .hdr{background:rgba(240,240,245,.95)}
 body.light .login-screen{background:var(--bg)}
 .theme-btn{width:30px;height:30px;border-radius:50%;border:1px solid var(--bd);background:var(--s2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.9rem;transition:all .18s;flex-shrink:0}
@@ -339,9 +356,9 @@ option{background:var(--s2)}
 <!-- ESTIMATOR -->
 <div class="pg" id="pg-estimator">
   <div class="mode-row">
-    <button class="mbtn on" id="mA" onclick="setMode('attend')">📅 Attend full day(s)</button>
-    <button class="mbtn" id="mB" onclick="setMode('bunk')">🚫 Skip specific classes</button>
-    <button class="mbtn" id="mC" onclick="setMode('cal')">🗓 Calendar picker</button>
+    <button class="mbtn on" id="mA" onclick="setMode('attend')">Attend full day(s)</button>
+    <button class="mbtn" id="mB" onclick="setMode('bunk')">Skip specific classes</button>
+    <button class="mbtn" id="mC" onclick="setMode('cal')">Calendar picker</button>
   </div>
   <!-- MODE A -->
   <div id="panelA">
@@ -404,7 +421,7 @@ option{background:var(--s2)}
   <div class="log-mode-row">
     <button class="lmbtn on" id="lm-day" onclick="setLogMode('day')">Day-by-Day</button>
     <button class="lmbtn" id="lm-bulk" onclick="setLogMode('bulk')">Bulk Entry</button>
-    <button class="lmbtn" id="lm-paste" onclick="setLogMode('paste')">📋 Paste Portal</button>
+    <button class="lmbtn" id="lm-paste" onclick="setLogMode('paste')">Paste Portal</button>
   </div>
   <!-- DAY LOG -->
   <div id="log-day-panel">
@@ -1199,7 +1216,7 @@ function showInstallBanner(){
   const b=document.createElement('div');
   b.id='pwa-banner';
   b.style.cssText='position:fixed;bottom:1.2rem;left:50%;transform:translateX(-50%);background:var(--s2);border:1px solid var(--pbd);border-radius:50px;padding:.55rem 1rem;font-size:.76rem;font-weight:600;color:var(--tx);z-index:998;display:flex;align-items:center;gap:.65rem;box-shadow:0 8px 32px rgba(0,0,0,.4);white-space:nowrap';
-  b.innerHTML=`<span>📲 Add BunkMeter to home screen</span><button onclick="installPWA()" style="background:var(--p);color:#000;border:none;border-radius:50px;padding:.28rem .75rem;font-family:Outfit,sans-serif;font-weight:700;font-size:.72rem;cursor:pointer">Install</button><button onclick="dismissBanner()" style="background:transparent;border:none;color:var(--tx3);cursor:pointer;font-size:1rem;line-height:1">✕</button>`;
+  b.innerHTML=`<span>Add BunkMeter to home screen</span><button onclick="installPWA()" style="background:var(--p);color:#000;border:none;border-radius:50px;padding:.28rem .75rem;font-family:Outfit,sans-serif;font-weight:700;font-size:.72rem;cursor:pointer">Install</button><button onclick="dismissBanner()" style="background:transparent;border:none;color:var(--tx3);cursor:pointer;font-size:1rem;line-height:1">✕</button>`;
   document.body.appendChild(b);
 }
 function installPWA(){
