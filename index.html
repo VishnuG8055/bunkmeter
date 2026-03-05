@@ -1076,10 +1076,11 @@ function parsePaste(){
     if(nums.length<2) continue;
     // Present and total: first two numbers where present <= total
     let present=-1,total=-1;
-    for(let i=0;i<nums.length-1;i++){
-      if(nums[i]<=nums[i+1]&&nums[i+1]>0&&nums[i+1]<=300&&nums[i]>2){
-        present=nums[i];total=nums[i+1];break;
-      }
+    if(nums.length>=3){
+      present=nums[nums.length-3];
+      total=nums[nums.length-2];
+    } else if(nums.length===2){
+      present=nums[0];total=nums[1];
     }
     if(present<0||total<=0) continue;
     // Avoid duplicates
