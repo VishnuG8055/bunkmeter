@@ -1056,37 +1056,44 @@ function parsePaste(){
   parsedPasteData=[];
   if(!raw){document.getElementById('paste-preview').innerHTML='';document.getElementById('paste-act').style.display='none';return;}
 
-  // Build code lookup
   const codeMap={};
   SUBJECTS.forEach(s=>{codeMap[s.code.toUpperCase()]=s;});
 
   const rows=[];
-  // Strategy: find subject codes (19ECBxxx, 19EHSxxx etc) then grab next 2-3 numbers after
   const codePattern=/\b((?:19|24)[A-Z0-9]+P?|HSMCH\d+)\b/gi;
   const matches=[...raw.matchAll(codePattern)];
 
-  for(const m of matches){
+  for(let i=0;i<matches.length;i++){
+    const m=matches[i];
     const code=m[1].toUpperCase();
     const sub=codeMap[code];
     if(!sub) continue;
-    // Grab text after this code (up to 120 chars)
-    const after=raw.slice(m.index+m[0].length, m.index+m[0].length+120);
-    // Extract all standalone numbers
-    const nums=(after.match(/\b(\d{1,3})\b/g)||[]).map(Number);
+    if(rows.find(r=>r.sub.code===sub.code)) continue;
+
+    // Slice text between this code and the next code (or end)
+    const start=m.index+m[0].length;
+    const end=i+1<matches.length ? matches[i+1].index : raw.length;
+    const segment=raw.slice(start,end);
+
+    // Extract all numbers from this segment
+    const nums=(segment.match(/\b\d{1,3}\b/g)||[]).map(Number);
     if(nums.length<2) continue;
-    // Present and total: first two numbers where present <= total
-    let present=-1,total=-1;
-    const filtered = nums.filter(n => n <= 300); // remove anything weird
-    if(filtered.length >= 3){
-      // last is percentage, ignore it
-      total = filtered[filtered.length-2];
-      present = filtered[filtered.length-3];
-    } else if(filtered.length === 2){
-      present = filtered[0]; total = filtered[1];
+
+    // The last number is always percentage (0-100), ignore it if 3+ nums
+    // Second-to-last = total, third-to-last = present
+    let present,total;
+    if(nums.length>=3){
+      // last = pct, drop it
+      total=nums[nums.length-2];
+      present=nums[nums.length-3];
+    } else {
+      // only 2 numbers = present, total (no percentage column)
+      present=nums[0];
+      total=nums[1];
     }
-    if(present < 0 || total <= 0 || present > total) continue;
-    // Avoid duplicates
-    if(!rows.find(r=>r.sub.code===sub.code)) rows.push({sub,present,total});
+
+    if(present>total||total<=0||present<0) continue;
+    rows.push({sub,present,total});
   }
 
   parsedPasteData=rows;
