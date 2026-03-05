@@ -1076,13 +1076,15 @@ function parsePaste(){
     if(nums.length<2) continue;
     // Present and total: first two numbers where present <= total
     let present=-1,total=-1;
-    if(nums.length>=3){
-      present=nums[nums.length-3];
-      total=nums[nums.length-2];
-    } else if(nums.length===2){
-      present=nums[0];total=nums[1];
+    const filtered = nums.filter(n => n <= 300); // remove anything weird
+    if(filtered.length >= 3){
+      // last is percentage, ignore it
+      total = filtered[filtered.length-2];
+      present = filtered[filtered.length-3];
+    } else if(filtered.length === 2){
+      present = filtered[0]; total = filtered[1];
     }
-    if(present<0||total<=0) continue;
+    if(present < 0 || total <= 0 || present > total) continue;
     // Avoid duplicates
     if(!rows.find(r=>r.sub.code===sub.code)) rows.push({sub,present,total});
   }
