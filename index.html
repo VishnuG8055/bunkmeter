@@ -28,26 +28,9 @@
 }
 body.light{
   --bg:#f0f0f5;--s1:#ffffff;--s2:#f5f5fa;--s3:#ebebf5;--s4:#e0e0ee;
-  --bd:#c8c8d8;--bd2:#a0a0b8;
-  --tx:#0a0a12;--tx2:#2a2a40;--tx3:#52526a;
+  --bd:#d0d0e0;--bd2:#b8b8d0;
+  --tx:#111118;--tx2:#44445a;--tx3:#88889a;
 }
-body.light .sec{color:#3a3a55}
-body.light .fl{color:#3a3a55}
-body.light .sj-code,body.light .bulk-code,body.light .lp-code,body.light .tt-cc{color:#4a4a62}
-body.light .nb{color:#4a4a62}
-body.light .nb.on{color:#0a0a12}
-body.light .ov-lbl{color:#2a2a40}
-body.light .ov-sub{color:#4a4a62}
-body.light .scl{color:#4a4a62}
-body.light .eol-lbl,body.light .eol-sub{color:#4a4a62}
-body.light .sync{color:#4a4a62}
-body.light .user-chip{color:#2a2a40;background:#ebebf5;border-color:#c8c8d8}
-body.light .tt-time{color:#4a4a62}
-body.light .settings-sub{color:#4a4a62}
-body.light .hi-sum{color:#2a2a40}
-body.light .chip-sub{color:#4a4a62}
-body.light .lcm{color:#4a4a62}
-body.light .lp-time{color:#4a4a62}
 body.light .hdr{background:rgba(240,240,245,.95)}
 body.light .login-screen{background:var(--bg)}
 .theme-btn{width:30px;height:30px;border-radius:50%;border:1px solid var(--bd);background:var(--s2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.9rem;transition:all .18s;flex-shrink:0}
@@ -318,9 +301,9 @@ option{background:var(--s2)}
     <div class="login-sub">Track attendance, estimate bunks,<br>stay above 75%.</div>
     <label class="login-label">Your Roll Number</label>
     <input class="login-input" id="roll-input" type="text" placeholder="e.g. 2023000810" maxlength="10" autocomplete="off" autocapitalize="characters" oninput="this.value=this.value.toUpperCase()" onkeydown="if(event.key==='Enter')doLogin()">
-    <div class="login-err" id="login-err">Enter a valid CSBS roll number (format: 2023XXXXXX)</div>
+    <div class="login-err" id="login-err">Roll number not recognised</div>
     <button class="login-btn" onclick="doLogin()">Continue →</button>
-    <div class="login-hint">For CSBS batch only · Format: 2023XXXXXX<br>Your data is saved separately per roll number.</div>
+    <div class="login-hint">CSBS: format 2023XXXXXX · Your data is saved separately per roll number.</div>
   </div>
 </div>
 
@@ -356,9 +339,9 @@ option{background:var(--s2)}
 <!-- ESTIMATOR -->
 <div class="pg" id="pg-estimator">
   <div class="mode-row">
-    <button class="mbtn" id="mC" onclick="setMode('cal')">Calendar picker</button>
-    <button class="mbtn on" id="mA" onclick="setMode('attend')">Attend full day(s)</button>
-    <button class="mbtn" id="mB" onclick="setMode('bunk')">Skip specific classes</button>
+    <button class="mbtn on" id="mA" onclick="setMode('attend')">📅 Attend full day(s)</button>
+    <button class="mbtn" id="mB" onclick="setMode('bunk')">🚫 Skip specific classes</button>
+    <button class="mbtn" id="mC" onclick="setMode('cal')">🗓 Calendar picker</button>
   </div>
   <!-- MODE A -->
   <div id="panelA">
@@ -419,9 +402,9 @@ option{background:var(--s2)}
 <!-- LOG -->
 <div class="pg" id="pg-log">
   <div class="log-mode-row">
-    <button class="lmbtn" id="lm-bulk" onclick="setLogMode('bulk')">Bulk Entry</button>
-    <button class="lmbtn" id="lm-paste" onclick="setLogMode('paste')">Paste Portal</button>
     <button class="lmbtn on" id="lm-day" onclick="setLogMode('day')">Day-by-Day</button>
+    <button class="lmbtn" id="lm-bulk" onclick="setLogMode('bulk')">Bulk Entry</button>
+    <button class="lmbtn" id="lm-paste" onclick="setLogMode('paste')">📋 Paste Portal</button>
   </div>
   <!-- DAY LOG -->
   <div id="log-day-panel">
@@ -518,57 +501,109 @@ option{background:var(--s2)}
 const SUPABASE_URL='https://dzvnihxhakcggzhqgppr.supabase.co';
 const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR6dm5paHhoYWtjZ2d6aHFncHByIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3NjcwMTUsImV4cCI6MjA4NzM0MzAxNX0.E8J5QnF_VH2YX_xQLiOtSKROJ8WtvZGHI3TLTgffNwQ';
 
-const SUBJECTS=[
-  {code:'19ECB332',  name:'Computer Networks',          p:17,t:24,type:'lecture'},
-  {code:'19ECB332P', name:'Computer Networks Lab',      p:22,t:28,type:'lab'},
-  {code:'19ECB334',  name:'Information Security',       p:19,t:21,type:'lecture'},
-  {code:'19ECB334P', name:'Information Security Lab',   p:15,t:16,type:'lab'},
-  {code:'19ECB336',  name:'Artificial Intelligence',    p:16,t:24,type:'lecture'},
-  {code:'19ECB336P', name:'AI Lab',                     p:10,t:14,type:'lab'},
-  {code:'19ECB346',  name:'Data Mining & Analytics',    p:13,t:15,type:'lecture'},
-  {code:'19ECB346P', name:'Data Mining Lab',            p:16,t:16,type:'lab'},
-  {code:'19EHS331',  name:'Business Communication',     p:12,t:15,type:'lecture'},
-  {code:'19EHS331P', name:'Business Comm Lab',          p:12,t:16,type:'lab'},
-  {code:'19EID302',  name:'Financial & Cost Accounting',p:15,t:17,type:'lecture'},
-  {code:'24CSEN1081',name:'Intermediate Coding-II',     p:9, t:16,type:'lecture'},
-  {code:'HSMCH102',  name:'Universal Human Values 2',   p:16,t:24,type:'lecture'},
-];
-const TT=[
-  {day:1,slot:'08',time:'08:00–08:50',code:'19ECB334'},
-  {day:1,slot:'09',time:'09:00–09:50',code:'19ECB346'},
-  {day:1,slot:'10',time:'10:00–10:50',code:'19ECB332P'},
-  {day:1,slot:'11',time:'11:00–11:50',code:'19ECB332P'},
-  {day:1,slot:'13',time:'13:00–13:50',code:'19EHS331'},
-  {day:1,slot:'14',time:'14:00–14:50',code:'19ECB336P'},
-  {day:1,slot:'15',time:'15:00–15:50',code:'19ECB336P'},
-  {day:2,slot:'08',time:'08:00–08:50',code:'19EHS331P'},
-  {day:2,slot:'09',time:'09:00–09:50',code:'19EHS331P'},
-  {day:2,slot:'10',time:'10:00–10:50',code:'19ECB332'},
-  {day:2,slot:'11',time:'11:00–11:50',code:'19ECB336'},
-  {day:2,slot:'13',time:'13:00–13:50',code:'HSMCH102'},
-  {day:2,slot:'14',time:'14:00–14:50',code:'24CSEN1081'},
-  {day:2,slot:'15',time:'15:00–15:50',code:'24CSEN1081'},
-  {day:3,slot:'08',time:'08:00–08:50',code:'19ECB336'},
-  {day:3,slot:'09',time:'09:00–09:50',code:'19ECB332'},
-  {day:3,slot:'10',time:'10:00–10:50',code:'19ECB334P'},
-  {day:3,slot:'11',time:'11:00–11:50',code:'19ECB334P'},
-  {day:3,slot:'13',time:'13:00–13:50',code:'19EID302'},
-  {day:3,slot:'14',time:'14:00–14:50',code:'HSMCH102'},
-  {day:4,slot:'08',time:'08:00–08:50',code:'19ECB332P'},
-  {day:4,slot:'09',time:'09:00–09:50',code:'19ECB332P'},
-  {day:4,slot:'10',time:'10:00–10:50',code:'19ECB346'},
-  {day:4,slot:'11',time:'11:00–11:50',code:'19EHS331'},
-  {day:4,slot:'13',time:'13:00–13:50',code:'HSMCH102'},
-  {day:4,slot:'14',time:'14:00–14:50',code:'19ECB334'},
-  {day:5,slot:'08',time:'08:00–08:50',code:'19ECB346P'},
-  {day:5,slot:'09',time:'09:00–09:50',code:'19ECB346P'},
-  {day:5,slot:'10',time:'10:00–10:50',code:'19ECB334'},
-  {day:5,slot:'11',time:'11:00–11:50',code:'19ECB332'},
-  {day:5,slot:'13',time:'13:00–13:50',code:'19EID302'},
-  {day:5,slot:'14',time:'14:00–14:50',code:'19ECB336'},
-];
-const SLOTS=['08','09','10','11','13','14','15'];
-const SLOT_LBL={'08':'08:00–08:50','09':'09:00–09:50','10':'10:00–10:50','11':'11:00–11:50','13':'13:00–13:50','14':'14:00–14:50','15':'15:00–15:50'};
+/* ── PROFILES (one per roll group) ── */
+const PROFILES={
+  csbs:{
+    subjects:[
+      {code:'19ECB332',  name:'Computer Networks',          p:17,t:24,type:'lecture'},
+      {code:'19ECB332P', name:'Computer Networks Lab',      p:22,t:28,type:'lab'},
+      {code:'19ECB334',  name:'Information Security',       p:19,t:21,type:'lecture'},
+      {code:'19ECB334P', name:'Information Security Lab',   p:15,t:16,type:'lab'},
+      {code:'19ECB336',  name:'Artificial Intelligence',    p:16,t:24,type:'lecture'},
+      {code:'19ECB336P', name:'AI Lab',                     p:10,t:14,type:'lab'},
+      {code:'19ECB346',  name:'Data Mining & Analytics',    p:13,t:15,type:'lecture'},
+      {code:'19ECB346P', name:'Data Mining Lab',            p:16,t:16,type:'lab'},
+      {code:'19EHS331',  name:'Business Communication',     p:12,t:15,type:'lecture'},
+      {code:'19EHS331P', name:'Business Comm Lab',          p:12,t:16,type:'lab'},
+      {code:'19EID302',  name:'Financial & Cost Accounting',p:15,t:17,type:'lecture'},
+      {code:'24CSEN1081',name:'Intermediate Coding-II',     p:9, t:16,type:'lecture'},
+      {code:'HSMCH102',  name:'Universal Human Values 2',   p:16,t:24,type:'lecture'},
+    ],
+    tt:[
+      {day:1,slot:'08',time:'08:00–08:50',code:'19ECB334'},
+      {day:1,slot:'09',time:'09:00–09:50',code:'19ECB346'},
+      {day:1,slot:'10',time:'10:00–10:50',code:'19ECB332P'},
+      {day:1,slot:'11',time:'11:00–11:50',code:'19ECB332P'},
+      {day:1,slot:'13',time:'13:00–13:50',code:'19EHS331'},
+      {day:1,slot:'14',time:'14:00–14:50',code:'19ECB336P'},
+      {day:1,slot:'15',time:'15:00–15:50',code:'19ECB336P'},
+      {day:2,slot:'08',time:'08:00–08:50',code:'19EHS331P'},
+      {day:2,slot:'09',time:'09:00–09:50',code:'19EHS331P'},
+      {day:2,slot:'10',time:'10:00–10:50',code:'19ECB332'},
+      {day:2,slot:'11',time:'11:00–11:50',code:'19ECB336'},
+      {day:2,slot:'13',time:'13:00–13:50',code:'HSMCH102'},
+      {day:2,slot:'14',time:'14:00–14:50',code:'24CSEN1081'},
+      {day:2,slot:'15',time:'15:00–15:50',code:'24CSEN1081'},
+      {day:3,slot:'08',time:'08:00–08:50',code:'19ECB336'},
+      {day:3,slot:'09',time:'09:00–09:50',code:'19ECB332'},
+      {day:3,slot:'10',time:'10:00–10:50',code:'19ECB334P'},
+      {day:3,slot:'11',time:'11:00–11:50',code:'19ECB334P'},
+      {day:3,slot:'13',time:'13:00–13:50',code:'19EID302'},
+      {day:3,slot:'14',time:'14:00–14:50',code:'HSMCH102'},
+      {day:4,slot:'08',time:'08:00–08:50',code:'19ECB332P'},
+      {day:4,slot:'09',time:'09:00–09:50',code:'19ECB332P'},
+      {day:4,slot:'10',time:'10:00–10:50',code:'19ECB346'},
+      {day:4,slot:'11',time:'11:00–11:50',code:'19EHS331'},
+      {day:4,slot:'13',time:'13:00–13:50',code:'HSMCH102'},
+      {day:4,slot:'14',time:'14:00–14:50',code:'19ECB334'},
+      {day:5,slot:'08',time:'08:00–08:50',code:'19ECB346P'},
+      {day:5,slot:'09',time:'09:00–09:50',code:'19ECB346P'},
+      {day:5,slot:'10',time:'10:00–10:50',code:'19ECB334'},
+      {day:5,slot:'11',time:'11:00–11:50',code:'19ECB332'},
+      {day:5,slot:'13',time:'13:00–13:50',code:'19EID302'},
+      {day:5,slot:'14',time:'14:00–14:50',code:'19ECB336'},
+    ],
+    slots:['08','09','10','11','13','14','15'],
+    slotLbl:{'08':'08:00–08:50','09':'09:00–09:50','10':'10:00–10:50','11':'11:00–11:50','13':'13:00–13:50','14':'14:00–14:50','15':'15:00–15:50'},
+  },
+  r2025669160:{
+    subjects:[
+      {code:'CHEM1062',  name:'Inorganic Chemistry-I',             p:15,t:29,type:'lecture'},
+      {code:'CHEM1062P', name:'Inorganic Chemistry Lab',           p:14,t:22,type:'lab'},
+      {code:'CHEM1101',  name:'Analytical Chemistry-I',            p:22,t:29,type:'lecture'},
+      {code:'CHEM1101P', name:'Analytical Chemistry Lab',          p:12,t:18,type:'lab'},
+      {code:'CSCI1312',  name:'Introduction to Data Science',      p:29,t:41,type:'lecture'},
+      {code:'ENVS1003',  name:'Environmental Studies',             p:5, t:11,type:'lecture'},
+      {code:'GCGC1041',  name:'Intro to Core Competencies',        p:14,t:18,type:'lecture'},
+      {code:'LANG1252',  name:'Communicative English-II',          p:19,t:38,type:'lecture'},
+      {code:'POLS1013',  name:'Foundations of Political Science',  p:22,t:30,type:'lecture'},
+      {code:'POLS2012',  name:'Indian Political System',           p:21,t:31,type:'lecture'},
+    ],
+    tt:[
+      {day:1,slot:'08',time:'08:00–08:50',code:'LANG1252'},
+      {day:1,slot:'09',time:'09:00–09:50',code:'LANG1252'},
+      {day:1,slot:'10',time:'10:00–10:50',code:'POLS1013'},
+      {day:1,slot:'11',time:'11:00–11:50',code:'CHEM1062'},
+      {day:1,slot:'12',time:'12:00–12:50',code:'CHEM1101'},
+      {day:1,slot:'13',time:'13:00–13:50',code:'GCGC1041'},
+      {day:1,slot:'14',time:'14:00–14:50',code:'GCGC1041'},
+      {day:2,slot:'08',time:'08:00–08:50',code:'CSCI1312'},
+      {day:2,slot:'09',time:'09:00–09:50',code:'CSCI1312'},
+      {day:2,slot:'10',time:'10:00–10:50',code:'POLS2012'},
+      {day:2,slot:'11',time:'11:00–11:50',code:'CHEM1101'},
+      {day:2,slot:'13',time:'13:00–13:50',code:'LANG1252'},
+      {day:2,slot:'14',time:'14:00–14:50',code:'LANG1252'},
+      {day:3,slot:'08',time:'08:00–08:50',code:'CHEM1062'},
+      {day:3,slot:'09',time:'09:00–09:50',code:'CHEM1062P'},
+      {day:3,slot:'10',time:'10:00–10:50',code:'POLS1013'},
+      {day:3,slot:'11',time:'11:00–11:50',code:'ENVS1003'},
+      {day:3,slot:'13',time:'13:00–13:50',code:'CHEM1062'},
+      {day:3,slot:'14',time:'14:00–14:50',code:'CSCI1312'},
+      {day:3,slot:'15',time:'15:00–15:50',code:'CSCI1312'},
+      {day:4,slot:'08',time:'08:00–08:50',code:'POLS2012'},
+      {day:4,slot:'09',time:'09:00–09:50',code:'CHEM1101'},
+      {day:4,slot:'10',time:'10:00–10:50',code:'CHEM1062'},
+      {day:4,slot:'11',time:'11:00–11:50',code:'CHEM1101'},
+      {day:4,slot:'12',time:'12:00–12:50',code:'CHEM1101P'},
+      {day:5,slot:'08',time:'08:00–08:50',code:'POLS1013'},
+      {day:5,slot:'09',time:'09:00–09:50',code:'POLS2012'},
+    ],
+    slots:['08','09','10','11','12','13','14','15','16'],
+    slotLbl:{'08':'08:00–08:50','09':'09:00–09:50','10':'10:00–10:50','11':'11:00–11:50','12':'12:00–12:50','13':'13:00–13:50','14':'14:00–14:50','15':'15:00–15:50','16':'16:00–16:50'},
+  },
+};
+/* ── Active profile vars (set at login) ── */
+let SUBJECTS=[],TT=[],SLOTS=[],SLOT_LBL={};
 // Base holidays — user can see these in settings
 const BASE_HOL={'2026-03-19':'Ugadi','2026-03-20':'Ramzan','2026-04-03':'Good Friday'};
 // Semester info
@@ -598,13 +633,27 @@ function canBunk(code,thr){const a=ATT[code];if(!a)return 0;const x=(a.present-(
 function mustAtt(code){const a=ATT[code];if(!a)return 0;if(pct(a.present,a.total)>=75)return 0;return Math.ceil(Math.max(0,(0.75*a.total-a.present)/0.25));}
 
 /* ── LOGIN ── */
+function resolveProfile(roll){
+  if(roll==='2025669160') return 'r2025669160';
+  if(/^2023\d{6}$/.test(roll)) return 'csbs';
+  return null;
+}
+function loadProfile(roll){
+  const key=resolveProfile(roll);
+  const p=PROFILES[key];
+  SUBJECTS=[...p.subjects];
+  TT=[...p.tt];
+  SLOTS=[...p.slots];
+  SLOT_LBL={...p.slotLbl};
+}
 function doLogin(){
   const roll=document.getElementById('roll-input').value.trim().toUpperCase();
-  if(!/^2023\d{6}$/.test(roll)){document.getElementById('login-err').style.display='block';return;}
+  if(!resolveProfile(roll)){document.getElementById('login-err').style.display='block';return;}
   document.getElementById('login-err').style.display='none';
   currentRoll=roll;
   // Reset state completely before loading new user's data
   ATT={};LOGS={};semEnd=DEFAULT_SEM_END;
+  loadProfile(roll);
   localStorage.setItem('bm_roll',roll);
   document.getElementById('login-screen').style.display='none';
   document.getElementById('user-chip').textContent=roll;
@@ -618,9 +667,10 @@ function logout(){
 }
 function checkAutoLogin(){
   const saved=localStorage.getItem('bm_roll');
-  if(saved){
+  if(saved&&resolveProfile(saved)){
     currentRoll=saved;
     ATT={};LOGS={};semEnd=DEFAULT_SEM_END;
+    loadProfile(saved);
     document.getElementById('roll-input').value=saved;
     document.getElementById('login-screen').style.display='none';
     document.getElementById('user-chip').textContent=saved;
@@ -1216,7 +1266,7 @@ function showInstallBanner(){
   const b=document.createElement('div');
   b.id='pwa-banner';
   b.style.cssText='position:fixed;bottom:1.2rem;left:50%;transform:translateX(-50%);background:var(--s2);border:1px solid var(--pbd);border-radius:50px;padding:.55rem 1rem;font-size:.76rem;font-weight:600;color:var(--tx);z-index:998;display:flex;align-items:center;gap:.65rem;box-shadow:0 8px 32px rgba(0,0,0,.4);white-space:nowrap';
-  b.innerHTML=`<span>Add BunkMeter to home screen</span><button onclick="installPWA()" style="background:var(--p);color:#000;border:none;border-radius:50px;padding:.28rem .75rem;font-family:Outfit,sans-serif;font-weight:700;font-size:.72rem;cursor:pointer">Install</button><button onclick="dismissBanner()" style="background:transparent;border:none;color:var(--tx3);cursor:pointer;font-size:1rem;line-height:1">✕</button>`;
+  b.innerHTML=`<span>📲 Add BunkMeter to home screen</span><button onclick="installPWA()" style="background:var(--p);color:#000;border:none;border-radius:50px;padding:.28rem .75rem;font-family:Outfit,sans-serif;font-weight:700;font-size:.72rem;cursor:pointer">Install</button><button onclick="dismissBanner()" style="background:transparent;border:none;color:var(--tx3);cursor:pointer;font-size:1rem;line-height:1">✕</button>`;
   document.body.appendChild(b);
 }
 function installPWA(){
