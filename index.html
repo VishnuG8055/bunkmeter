@@ -43,7 +43,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--tx);min-he
 ::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:2px}
 .app{display:flex;flex-direction:column;min-height:100dvh}
 
-/* LOGIN SCREEN */
+/* LOGIN */
 .login-screen{position:fixed;inset:0;background:var(--bg);z-index:500;display:flex;align-items:center;justify-content:center;padding:1.5rem}
 .login-box{width:100%;max-width:380px}
 .login-logo{font-size:2rem;font-weight:800;letter-spacing:-.04em;margin-bottom:.4rem}
@@ -110,6 +110,30 @@ option{background:var(--s2)}
 .toast.tg{color:var(--g);border-color:var(--gbd)}
 .toast.tr{color:var(--r);border-color:var(--rbd)}
 
+/* EXAM BANNER */
+.exam-card{position:relative;border-radius:var(--rad);margin-bottom:.85rem;overflow:hidden;cursor:pointer;transition:transform .18s;-webkit-tap-highlight-color:transparent;border:1px solid transparent}
+.exam-card:active{transform:scale(.985)}
+.exam-card-bg{position:absolute;inset:0;z-index:0}
+.exam-card-content{position:relative;z-index:1;padding:.9rem 1rem;display:flex;align-items:center;gap:.85rem}
+.exam-ring-wrap{flex-shrink:0;width:54px;height:54px;position:relative}
+.exam-ring-wrap svg{width:54px;height:54px;transform:rotate(-90deg)}
+.exam-ring-track{fill:none;stroke-width:4.5;stroke:rgba(255,255,255,.1)}
+.exam-ring-fill{fill:none;stroke-width:4.5;stroke-linecap:round;transition:stroke-dashoffset 1.2s cubic-bezier(.4,0,.2,1)}
+.exam-ring-center{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column}
+.exam-ring-days{font-family:'JetBrains Mono',monospace;font-size:.95rem;font-weight:500;line-height:1}
+.exam-ring-lbl{font-size:.38rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;opacity:.6;margin-top:2px}
+.exam-card-info{flex:1;min-width:0}
+.exam-card-name{font-size:.62rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;opacity:.6;margin-bottom:.18rem}
+.exam-card-title{font-size:.92rem;font-weight:800;line-height:1.25;margin-bottom:.32rem}
+.exam-card-pills{display:flex;gap:.3rem;flex-wrap:wrap}
+.exam-pill{font-size:.6rem;font-weight:700;padding:.16rem .48rem;border-radius:50px;background:rgba(255,255,255,.13);letter-spacing:.02em;white-space:nowrap}
+.exam-pill.warn{background:rgba(240,68,68,.35)}
+.exam-pill.ok{background:rgba(34,212,115,.28)}
+@keyframes ex-pulse{0%,100%{opacity:1}50%{opacity:.78}}
+.exam-card.urgent .exam-card-content{animation:ex-pulse 1.6s ease-in-out infinite}
+@keyframes ex-grad{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+.exam-card-bg.anim{background-size:200% 200%;animation:ex-grad 5s ease infinite}
+
 /* OVERVIEW */
 .ov-hero{background:var(--s1);border:1px solid var(--bd);border-radius:var(--rad);padding:1.1rem 1.15rem;margin-bottom:.85rem}
 .ov-row{display:flex;flex-direction:column;gap:.75rem;margin-bottom:.0rem}
@@ -119,8 +143,6 @@ option{background:var(--s2)}
 .ov-sub{font-size:.68rem;color:var(--tx3);margin-top:.22rem}
 .ov-bar-wrap{width:100%}
 .ov-markers{display:flex;justify-content:space-between;font-size:.58rem;color:var(--tx3);margin-top:.28rem}
-.ov-markers-wrap{position:relative;width:100%}
-.ov-marker-line{position:absolute;top:-9px;width:1px;height:6px;background:currentColor;opacity:.5}
 .sg{display:grid;grid-template-columns:repeat(4,1fr);gap:.45rem;margin-bottom:.9rem}
 @media(max-width:400px){.sg{grid-template-columns:repeat(2,1fr)}}
 .sc{background:var(--s1);border:1px solid var(--bd);border-radius:var(--rad);padding:.7rem;text-align:center}
@@ -169,10 +191,11 @@ option{background:var(--s2)}
 .cec.wknd{opacity:.28;cursor:default}
 .cec.hol{background:var(--rbg);border-color:var(--rbd);color:var(--r);cursor:default}
 .cec.past{opacity:.3;cursor:default}
+.cec.exam{background:var(--ybg);border-color:var(--ybd);color:var(--y);cursor:default}
 .cec.sel-full{background:var(--pbg);border-color:var(--pbd);color:var(--p)}
 .cec.sel-partial{background:var(--ybg);border-color:var(--ybd);color:var(--y)}
 .cec.sel-skip{background:var(--rbg);border-color:var(--rbd);color:var(--r)}
-.cec:not(.emp):not(.wknd):not(.hol):not(.past):hover{border-color:var(--bd2)}
+.cec:not(.emp):not(.wknd):not(.hol):not(.past):not(.exam):hover{border-color:var(--bd2)}
 .cecn{font-family:'JetBrains Mono',monospace;font-size:.64rem;line-height:1}
 .cec-slots{font-size:.48rem;color:inherit;margin-top:2px;opacity:.75}
 .cal-est-legend{display:grid;grid-template-columns:1fr 1fr;gap:.4rem;margin-bottom:.9rem}
@@ -234,11 +257,12 @@ option{background:var(--s2)}
 .cc.emp{background:transparent;border-color:transparent}
 .cc.wknd{opacity:.28}
 .cc.hol{background:var(--rbg);border-color:var(--rbd);color:var(--r)}
+.cc.exam{background:var(--ybg);border-color:var(--ybd);color:var(--y)}
 .cc.logged{background:var(--gbg);border-color:var(--gbd);color:var(--g)}
 .cc.today{border-color:var(--p);color:var(--tx)}
 .cc.past:not(.logged):not(.hol):not(.wknd){opacity:.42}
 .ccn{font-family:'JetBrains Mono',monospace;font-size:.66rem;line-height:1;margin-bottom:1px}
-.cch{font-size:.4rem;color:var(--r);text-align:center;line-height:1.2;margin-top:1px;padding:0 1px;word-break:break-word}
+.cch{font-size:.4rem;color:inherit;text-align:center;line-height:1.2;margin-top:1px;padding:0 1px;word-break:break-word}
 .ccd{display:flex;gap:1px;flex-wrap:wrap;justify-content:center;margin-top:2px}
 .cd{width:3px;height:3px;border-radius:50%}
 .cal-legend{display:flex;gap:.85rem;flex-wrap:wrap;font-size:.68rem;color:var(--tx3);margin-top:.5rem}
@@ -298,12 +322,12 @@ option{background:var(--s2)}
 <div class="login-screen" id="login-screen">
   <div class="login-box">
     <div class="login-logo">Bunk<em>Meter</em></div>
-    <div class="login-sub">Track attendance, estimate bunks,<br>stay above 75%.</div>
+    <div class="login-sub">Track attendance, estimate bunks,<br>stay above 75%. AY 2026-27 Odd Sem.</div>
     <label class="login-label">Your Roll Number</label>
     <input class="login-input" id="roll-input" type="text" placeholder="e.g. 2023000810" maxlength="10" autocomplete="off" autocapitalize="characters" oninput="this.value=this.value.toUpperCase()" onkeydown="if(event.key==='Enter')doLogin()">
     <div class="login-err" id="login-err">Roll number not recognised</div>
     <button class="login-btn" onclick="doLogin()">Continue →</button>
-    <div class="login-hint">CSBS: format 2023XXXXXX · Your data is saved separately per roll number.</div>
+    <div class="login-hint">CSBS 2023 batch: format 2023XXXXXX</div>
   </div>
 </div>
 
@@ -329,6 +353,7 @@ option{background:var(--s2)}
 <div class="pg on" id="pg-overview">
   <div id="ov-spin" style="text-align:center;padding:2rem;color:var(--tx3);font-size:.82rem">Loading…</div>
   <div id="ov-body" style="display:none">
+    <div id="exam-banner-wrap"></div>
     <div class="ov-hero" id="ov-hero"></div>
     <div class="sg" id="ov-stats"></div>
     <div class="sec">All Subjects</div>
@@ -348,7 +373,7 @@ option{background:var(--s2)}
     <div class="est-panel">
       <div class="sec" style="margin-bottom:.6rem">Pick dates — see what happens if you attend everything</div>
       <div class="frow">
-        <div class="fg" style="flex:1"><label class="fl">Date</label><input type="date" id="ea-date" min="2026-02-23"></div>
+        <div class="fg" style="flex:1"><label class="fl">Date</label><input type="date" id="ea-date" min="2026-06-29"></div>
         <button class="btn btn-s" onclick="addAttendDate()">+ Add</button>
       </div>
     </div>
@@ -365,7 +390,7 @@ option{background:var(--s2)}
     <div class="est-panel">
       <div class="sec" style="margin-bottom:.6rem">Pick classes to skip — only shows subjects scheduled that day</div>
       <div class="frow">
-        <div class="fg" style="flex:1;min-width:120px"><label class="fl">Date</label><input type="date" id="eb-date" min="2026-02-23" onchange="refreshBSubjects()"></div>
+        <div class="fg" style="flex:1;min-width:120px"><label class="fl">Date</label><input type="date" id="eb-date" min="2026-06-29" onchange="refreshBSubjects()"></div>
         <div class="fg" style="flex:1.4;min-width:130px"><label class="fl">Subject (that day)</label><select id="eb-subj"><option value="">— pick date first —</option></select></div>
         <button class="btn btn-s" onclick="addBunkEntry()">+ Add</button>
       </div>
@@ -378,7 +403,7 @@ option{background:var(--s2)}
       </div>
     </div>
   </div>
-  <!-- MODE C: CALENDAR PICKER -->
+  <!-- MODE C -->
   <div id="panelC" style="display:none">
     <div style="font-size:.72rem;color:var(--tx3);margin-bottom:.45rem;font-weight:600">Tap a date to cycle through states:</div>
     <div class="cal-est-legend">
@@ -420,7 +445,7 @@ option{background:var(--s2)}
   <!-- BULK LOG -->
   <div id="log-bulk-panel" style="display:none">
     <div class="card" style="margin-bottom:.7rem">
-      <p style="font-size:.8rem;color:var(--tx2);line-height:1.6;margin-bottom:.75rem">Enter present and total classes for each subject. This <strong>replaces</strong> the current base values. Use this if you missed logging days.</p>
+      <p style="font-size:.8rem;color:var(--tx2);line-height:1.6;margin-bottom:.75rem">Enter present and total classes for each subject. This <strong>replaces</strong> the current base values.</p>
       <div id="bulk-subj-list"></div>
       <div style="margin-top:.85rem;display:flex;gap:.5rem">
         <button class="btn btn-p" style="flex:1" onclick="saveBulk()">Save All</button>
@@ -432,7 +457,7 @@ option{background:var(--s2)}
   <div id="log-paste-panel" style="display:none">
     <div class="card" style="margin-bottom:.7rem">
       <div style="font-size:.82rem;font-weight:700;margin-bottom:.3rem">Paste from College Portal</div>
-      <p style="font-size:.76rem;color:var(--tx2);line-height:1.6;margin-bottom:.75rem">Go to <strong>G-Learn</strong> → Attendance page → select all table rows (Ctrl+A on table) → copy (Ctrl+C) → paste below.</p>
+      <p style="font-size:.76rem;color:var(--tx2);line-height:1.6;margin-bottom:.75rem">Go to <strong>G-Learn</strong> → Attendance page → select all table rows → copy → paste below.</p>
       <textarea id="paste-input" style="width:100%;background:var(--s2);border:1px solid var(--bd);color:var(--tx);padding:.65rem .8rem;border-radius:var(--rad-s);font-family:'JetBrains Mono',monospace;font-size:.72rem;resize:vertical;min-height:130px;outline:none;transition:border-color .18s;line-height:1.5" placeholder="Paste copied attendance table here…" oninput="parsePaste()"></textarea>
       <div id="paste-preview" style="margin-top:.7rem"></div>
       <div id="paste-act" style="margin-top:.7rem;gap:.5rem;flex-wrap:wrap;display:none">
@@ -449,6 +474,7 @@ option{background:var(--s2)}
   <div class="cal-legend">
     <div class="cli"><div class="clb" style="background:var(--gbg);border-color:var(--gbd)"></div>Logged</div>
     <div class="cli"><div class="clb" style="background:var(--rbg);border-color:var(--rbd)"></div>Holiday</div>
+    <div class="cli"><div class="clb" style="background:var(--ybg);border-color:var(--ybd)"></div>Exam</div>
     <div class="cli"><div class="clb" style="border-color:var(--p)"></div>Today</div>
     <div class="cli"><div class="clb" style="background:var(--s1);border-color:var(--bd);opacity:.4"></div>Unlogged</div>
   </div>
@@ -460,7 +486,6 @@ option{background:var(--s2)}
     <span class="tt-li" style="background:rgba(245,197,24,.08);color:var(--y);border:1px solid rgba(245,197,24,.25)">Lecture</span>
     <span class="tt-li" style="background:rgba(79,142,247,.08);color:var(--b);border:1px solid rgba(79,142,247,.25)">Lab</span>
   </div>
-  <div class="tt-wrap"><table class="tt-table" id="tt-tbl"></table></div>
   <div class="tt-mobile" id="tt-mobile"></div>
 </div>
 
@@ -477,18 +502,35 @@ option{background:var(--s2)}
   <div class="sec">Semester</div>
   <div class="settings-card">
     <div class="settings-row">
-      <div><div class="settings-lbl">Semester End Date</div><div class="settings-sub">Last day classes can be logged</div></div>
+      <div><div class="settings-lbl">Semester End Date</div><div class="settings-sub">Last day of classwork</div></div>
       <input type="date" id="sem-end-input" style="width:140px" onchange="saveSemEnd()">
     </div>
     <div class="settings-row">
-      <div><div class="settings-lbl">Holidays</div><div class="settings-sub" id="hol-list-disp"></div></div>
+      <div><div class="settings-lbl">Sessional-I Exams</div><div class="settings-sub">Aug 19–28, 2026 · No attendance counted</div></div>
+    </div>
+    <div class="settings-row">
+      <div><div class="settings-lbl">Sessional-II Exams</div><div class="settings-sub">Nov 11–20, 2026 · No attendance counted</div></div>
+    </div>
+    <div class="settings-row">
+      <div><div class="settings-lbl">Holidays (VSP)</div><div class="settings-sub" id="hol-list-disp"></div></div>
+    </div>
+  </div>
+
+  <div class="sec">Notifications</div>
+  <div class="settings-card">
+    <div class="settings-row">
+      <div>
+        <div class="settings-lbl">Daily Attendance Reminder</div>
+        <div class="settings-sub" id="notif-status">Get nudged at 6:30 PM to log today's attendance</div>
+      </div>
+      <button class="btn btn-g btn-sm" id="notif-btn" onclick="requestPushPermission()">Enable</button>
     </div>
   </div>
 
   <div class="sec">Danger Zone</div>
   <div class="settings-card">
     <div class="settings-row">
-      <div><div class="settings-lbl">Reset All Attendance</div><div class="settings-sub">Clears all logs and resets to base values</div></div>
+      <div><div class="settings-lbl">Reset All Attendance</div><div class="settings-sub">Clears all logs and resets counters to zero</div></div>
       <button class="btn btn-d btn-sm" onclick="resetAll()">Reset</button>
     </div>
   </div>
@@ -501,141 +543,237 @@ option{background:var(--s2)}
 const SUPABASE_URL='https://dzvnihxhakcggzhqgppr.supabase.co';
 const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR6dm5paHhoYWtjZ2d6aHFncHByIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3NjcwMTUsImV4cCI6MjA4NzM0MzAxNX0.E8J5QnF_VH2YX_xQLiOtSKROJ8WtvZGHI3TLTgffNwQ';
 
-/* ── PROFILES (one per roll group) ── */
-const PROFILES={
-  csbs:{
-    subjects:[
-      {code:'19ECB332',  name:'Computer Networks',          p:17,t:24,type:'lecture'},
-      {code:'19ECB332P', name:'Computer Networks Lab',      p:22,t:28,type:'lab'},
-      {code:'19ECB334',  name:'Information Security',       p:19,t:21,type:'lecture'},
-      {code:'19ECB334P', name:'Information Security Lab',   p:15,t:16,type:'lab'},
-      {code:'19ECB336',  name:'Artificial Intelligence',    p:16,t:24,type:'lecture'},
-      {code:'19ECB336P', name:'AI Lab',                     p:10,t:14,type:'lab'},
-      {code:'19ECB346',  name:'Data Mining & Analytics',    p:13,t:15,type:'lecture'},
-      {code:'19ECB346P', name:'Data Mining Lab',            p:16,t:16,type:'lab'},
-      {code:'19EHS331',  name:'Business Communication',     p:12,t:15,type:'lecture'},
-      {code:'19EHS331P', name:'Business Comm Lab',          p:12,t:16,type:'lab'},
-      {code:'19EID302',  name:'Financial & Cost Accounting',p:15,t:17,type:'lecture'},
-      {code:'24CSEN1081',name:'Intermediate Coding-II',     p:9, t:16,type:'lecture'},
-      {code:'HSMCH102',  name:'Universal Human Values 2',   p:16,t:24,type:'lecture'},
+/* ─── PROFILES ─── */
+const PROFILES = {
+  csbs: {
+    subjects: [
+      {code:'19ECB431',  name:'Usability Design of Software Applications', p:0,t:0,type:'lecture'},
+      {code:'19ECB431P', name:'Usability Design Lab',                       p:0,t:0,type:'lab'},
+      {code:'19ECB433',  name:'IT Workshop Skylab / Matlab',                p:0,t:0,type:'lecture'},
+      {code:'19ECB433P', name:'IT Workshop Lab',                            p:0,t:0,type:'lab'},
+      {code:'19ECB447',  name:'Cognitive Science and Analytics',            p:0,t:0,type:'lecture'},
+      {code:'19ECB447P', name:'Cognitive Science Lab',                      p:0,t:0,type:'lab'},
+      {code:'19ECB455',  name:'Advanced Social, Text & Media Analytics',    p:0,t:0,type:'lecture'},
+      {code:'19ECB455P', name:'Social Text Media Analytics Lab',            p:0,t:0,type:'lab'},
+      {code:'19ECB491',  name:'Project Evaluation I',                       p:0,t:0,type:'lab'},
+      {code:'19EID401',  name:'Financial Management',                       p:0,t:0,type:'lecture'},
+      {code:'19EID403',  name:'Human Resource Management',                  p:0,t:0,type:'lecture'},
     ],
-    tt:[
-      {day:1,slot:'08',time:'08:00–08:50',code:'19ECB334'},
-      {day:1,slot:'09',time:'09:00–09:50',code:'19ECB346'},
-      {day:1,slot:'10',time:'10:00–10:50',code:'19ECB332P'},
-      {day:1,slot:'11',time:'11:00–11:50',code:'19ECB332P'},
-      {day:1,slot:'13',time:'13:00–13:50',code:'19EHS331'},
-      {day:1,slot:'14',time:'14:00–14:50',code:'19ECB336P'},
-      {day:1,slot:'15',time:'15:00–15:50',code:'19ECB336P'},
-      {day:2,slot:'08',time:'08:00–08:50',code:'19EHS331P'},
-      {day:2,slot:'09',time:'09:00–09:50',code:'19EHS331P'},
-      {day:2,slot:'10',time:'10:00–10:50',code:'19ECB332'},
-      {day:2,slot:'11',time:'11:00–11:50',code:'19ECB336'},
-      {day:2,slot:'13',time:'13:00–13:50',code:'HSMCH102'},
-      {day:2,slot:'14',time:'14:00–14:50',code:'24CSEN1081'},
-      {day:2,slot:'15',time:'15:00–15:50',code:'24CSEN1081'},
-      {day:3,slot:'08',time:'08:00–08:50',code:'19ECB336'},
-      {day:3,slot:'09',time:'09:00–09:50',code:'19ECB332'},
-      {day:3,slot:'10',time:'10:00–10:50',code:'19ECB334P'},
-      {day:3,slot:'11',time:'11:00–11:50',code:'19ECB334P'},
-      {day:3,slot:'13',time:'13:00–13:50',code:'19EID302'},
-      {day:3,slot:'14',time:'14:00–14:50',code:'HSMCH102'},
-      {day:4,slot:'08',time:'08:00–08:50',code:'19ECB332P'},
-      {day:4,slot:'09',time:'09:00–09:50',code:'19ECB332P'},
-      {day:4,slot:'10',time:'10:00–10:50',code:'19ECB346'},
-      {day:4,slot:'11',time:'11:00–11:50',code:'19EHS331'},
-      {day:4,slot:'13',time:'13:00–13:50',code:'HSMCH102'},
-      {day:4,slot:'14',time:'14:00–14:50',code:'19ECB334'},
-      {day:5,slot:'08',time:'08:00–08:50',code:'19ECB346P'},
-      {day:5,slot:'09',time:'09:00–09:50',code:'19ECB346P'},
-      {day:5,slot:'10',time:'10:00–10:50',code:'19ECB334'},
-      {day:5,slot:'11',time:'11:00–11:50',code:'19ECB332'},
-      {day:5,slot:'13',time:'13:00–13:50',code:'19EID302'},
-      {day:5,slot:'14',time:'14:00–14:50',code:'19ECB336'},
+    // Timetable: day 1=Mon,2=Tue,3=Wed,4=Thu,5=Fri
+    // WeekOrder 2 = Week 2 (standard), used as primary schedule
+    tt: [
+      // Monday
+      {day:1, slot:'08', time:'08:00–08:50', code:'19EID401'},
+      {day:1, slot:'09', time:'09:00–09:50', code:'19ECB431'},
+      {day:1, slot:'10', time:'10:00–10:50', code:'19ECB447'},
+      {day:1, slot:'11', time:'11:00–11:50', code:'19ECB455'},
+      {day:1, slot:'14', time:'14:00–14:50', code:'19ECB433P'},
+      {day:1, slot:'15', time:'15:00–15:50', code:'19ECB433P'},
+      // Tuesday
+      {day:2, slot:'08', time:'08:00–08:50', code:'19ECB433P'},
+      {day:2, slot:'09', time:'09:00–09:50', code:'19ECB433P'},
+      {day:2, slot:'10', time:'10:00–10:50', code:'19ECB455'},
+      {day:2, slot:'11', time:'11:00–11:50', code:'19ECB447'},
+      // Wednesday
+      {day:3, slot:'08', time:'08:00–08:50', code:'19ECB433'},
+      {day:3, slot:'09', time:'09:00–09:50', code:'19EID401'},
+      {day:3, slot:'10', time:'10:00–10:50', code:'19ECB447P'},
+      {day:3, slot:'11', time:'11:00–11:50', code:'19ECB447P'},
+      {day:3, slot:'13', time:'13:00–13:50', code:'19EID403'},
+      {day:3, slot:'14', time:'14:00–14:50', code:'19ECB491'},
+      {day:3, slot:'15', time:'15:00–15:50', code:'19ECB491'},
+      // Thursday
+      {day:4, slot:'08', time:'08:00–08:50', code:'19EID403'},
+      {day:4, slot:'09', time:'09:00–09:50', code:'19ECB431'},
+      {day:4, slot:'10', time:'10:00–10:50', code:'19ECB455'},
+      {day:4, slot:'11', time:'11:00–11:50', code:'19ECB447'},
+      // Friday
+      {day:5, slot:'08', time:'08:00–08:50', code:'19ECB431P'},
+      {day:5, slot:'09', time:'09:00–09:50', code:'19ECB431P'},
+      {day:5, slot:'10', time:'10:00–10:50', code:'19ECB455P'},
+      {day:5, slot:'11', time:'11:00–11:50', code:'19ECB455P'},
+      {day:5, slot:'13', time:'13:00–13:50', code:'19EID401'},
     ],
-    slots:['08','09','10','11','13','14','15'],
-    slotLbl:{'08':'08:00–08:50','09':'09:00–09:50','10':'10:00–10:50','11':'11:00–11:50','13':'13:00–13:50','14':'14:00–14:50','15':'15:00–15:50'},
-  },
-  r2025669160:{
-    subjects:[
-      {code:'CHEM1062',  name:'Inorganic Chemistry-I',             p:15,t:29,type:'lecture'},
-      {code:'CHEM1062P', name:'Inorganic Chemistry Lab',           p:14,t:22,type:'lab'},
-      {code:'CHEM1101',  name:'Analytical Chemistry-I',            p:22,t:29,type:'lecture'},
-      {code:'CHEM1101P', name:'Analytical Chemistry Lab',          p:12,t:18,type:'lab'},
-      {code:'CSCI1312',  name:'Introduction to Data Science',      p:29,t:41,type:'lecture'},
-      {code:'ENVS1003',  name:'Environmental Studies',             p:5, t:11,type:'lecture'},
-      {code:'GCGC1041',  name:'Intro to Core Competencies',        p:14,t:18,type:'lecture'},
-      {code:'LANG1252',  name:'Communicative English-II',          p:19,t:38,type:'lecture'},
-      {code:'POLS1013',  name:'Foundations of Political Science',  p:22,t:30,type:'lecture'},
-      {code:'POLS2012',  name:'Indian Political System',           p:21,t:31,type:'lecture'},
-    ],
-    tt:[
-      {day:1,slot:'08',time:'08:00–08:50',code:'LANG1252'},
-      {day:1,slot:'09',time:'09:00–09:50',code:'LANG1252'},
-      {day:1,slot:'10',time:'10:00–10:50',code:'POLS1013'},
-      {day:1,slot:'11',time:'11:00–11:50',code:'CHEM1062'},
-      {day:1,slot:'12',time:'12:00–12:50',code:'CHEM1101'},
-      {day:1,slot:'13',time:'13:00–13:50',code:'GCGC1041'},
-      {day:1,slot:'14',time:'14:00–14:50',code:'GCGC1041'},
-      {day:2,slot:'08',time:'08:00–08:50',code:'CSCI1312'},
-      {day:2,slot:'09',time:'09:00–09:50',code:'CSCI1312'},
-      {day:2,slot:'10',time:'10:00–10:50',code:'POLS2012'},
-      {day:2,slot:'11',time:'11:00–11:50',code:'CHEM1101'},
-      {day:2,slot:'13',time:'13:00–13:50',code:'LANG1252'},
-      {day:2,slot:'14',time:'14:00–14:50',code:'LANG1252'},
-      {day:3,slot:'08',time:'08:00–08:50',code:'CHEM1062'},
-      {day:3,slot:'09',time:'09:00–09:50',code:'CHEM1062P'},
-      {day:3,slot:'10',time:'10:00–10:50',code:'POLS1013'},
-      {day:3,slot:'11',time:'11:00–11:50',code:'ENVS1003'},
-      {day:3,slot:'13',time:'13:00–13:50',code:'CHEM1062'},
-      {day:3,slot:'14',time:'14:00–14:50',code:'CSCI1312'},
-      {day:3,slot:'15',time:'15:00–15:50',code:'CSCI1312'},
-      {day:4,slot:'08',time:'08:00–08:50',code:'POLS2012'},
-      {day:4,slot:'09',time:'09:00–09:50',code:'CHEM1101'},
-      {day:4,slot:'10',time:'10:00–10:50',code:'CHEM1062'},
-      {day:4,slot:'11',time:'11:00–11:50',code:'CHEM1101'},
-      {day:4,slot:'12',time:'12:00–12:50',code:'CHEM1101P'},
-      {day:5,slot:'08',time:'08:00–08:50',code:'POLS1013'},
-      {day:5,slot:'09',time:'09:00–09:50',code:'POLS2012'},
-    ],
-    slots:['08','09','10','11','12','13','14','15','16'],
-    slotLbl:{'08':'08:00–08:50','09':'09:00–09:50','10':'10:00–10:50','11':'11:00–11:50','12':'12:00–12:50','13':'13:00–13:50','14':'14:00–14:50','15':'15:00–15:50','16':'16:00–16:50'},
-  },
+    slots: ['08','09','10','11','13','14','15'],
+    slotLbl: {
+      '08':'08:00–08:50','09':'09:00–09:50','10':'10:00–10:50',
+      '11':'11:00–11:50','13':'13:00–13:50','14':'14:00–14:50','15':'15:00–15:50'
+    },
+  }
 };
-/* ── Active profile vars (set at login) ── */
+
+/* ─── Active profile vars ─── */
 let SUBJECTS=[],TT=[],SLOTS=[],SLOT_LBL={};
-// Base holidays — user can see these in settings
-const BASE_HOL={'2026-03-19':'Ugadi','2026-03-20':'Ramzan','2026-03-27':'Rama Navami','2026-04-03':'Good Friday','2026-04-14':'Ambedkar Jayanthi'};
-// Semester info
-const SEM_START='2026-02-23';
-const SEM_CLASSWORK_END='2026-04-15'; // last day of classwork
-const DEFAULT_SEM_END='2026-04-15';
 
-/* ── STATE ── */
-let db=null,ATT={},LOGS={},currentRoll='',semEnd=DEFAULT_SEM_END;
-let estMode='attend',attendDates=[],bunkEntries=[],logState={},logMode='day';
-let calEstState={}; // ds -> 'full'|'partial'|'skip', partial has skipSet
+/* ─── Academic Calendar 2026-27 Odd Sem ─── */
+// Holidays for VSP (Visakhapatnam) campus
+const BASE_HOL = {
+  '2026-08-15': 'Independence Day',
+  '2026-09-04': 'Srikrishna Janmashtami',
+  '2026-09-14': 'Vinayaka Chaturdhi',
+  '2026-10-02': 'Gandhi Jayanthi',
+  '2026-10-20': 'Vijayadasami',
+  '2026-11-08': 'Deepavali',
+};
 
-/* ── HELPERS ── */
+// Sessional exam periods (no attendance logged on these days)
+const SESSIONAL1_START = '2026-08-19';
+const SESSIONAL1_END   = '2026-08-28';
+const SESSIONAL2_START = '2026-11-11';
+const SESSIONAL2_END   = '2026-11-20';
+
+// Non-instructional working days before sessional-I (Aug 17-18) — classes might differ
+// We treat these as class days for attendance purposes
+
+const SEM_START         = '2026-06-29'; // Commencement of class work
+const DEFAULT_SEM_END   = '2026-11-06'; // Last day of classwork / sessional-II attendance cutoff
+
+/* ─── STATE ─── */
+let db=null, ATT={}, LOGS={}, currentRoll='', semEnd=DEFAULT_SEM_END;
+let estMode='attend', attendDates=[], bunkEntries=[], logState={}, logMode='day';
+let calEstState={};
+
+/* ─── HELPERS ─── */
 const pct=(p,t)=>t?(p/t)*100:0;
 const today=()=>{const d=new Date();return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`};
 const sname=c=>(SUBJECTS.find(s=>s.code===c)||{}).name||c;
 const dname=ds=>['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][new Date(ds+'T00:00:00').getDay()];
 const fmtDate=ds=>new Date(ds+'T00:00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short'});
+
+function isExamDay(ds){
+  return (ds>=SESSIONAL1_START && ds<=SESSIONAL1_END) ||
+         (ds>=SESSIONAL2_START && ds<=SESSIONAL2_END);
+}
+
 function colOf(p,t){const v=pct(p,t);if(v>=80)return'g';if(v>=75)return'y';if(v>=65)return'o';return'r';}
 function colVar(p,t){return{g:'var(--g)',y:'var(--y)',o:'var(--o)',r:'var(--r)'}[colOf(p,t)];}
-function attDot(code){const a=ATT[code];if(!a)return'var(--tx3)';return colVar(a.present,a.total);}
-function attPct(code){const a=ATT[code];if(!a)return'—';return pct(a.present,a.total).toFixed(0)+'%';}
-function isHol(ds){if(BASE_HOL[ds])return true;const d=new Date(ds+'T00:00:00');return d.getDay()===0||d.getDay()===6;}
-function getSlots(ds){if(isHol(ds))return[];const dow=new Date(ds+'T00:00:00').getDay();return TT.filter(t=>t.day===dow);}
-function overallAtt(){let p=0,t=0;SUBJECTS.forEach(s=>{const a=ATT[s.code];if(a){p+=a.present;t+=a.total;}});return{p,t};}
-function canBunk(code,thr){const a=ATT[code];if(!a)return 0;const x=(a.present-(thr/100)*a.total)/(thr/100);return Math.max(0,Math.floor(x));}
-function mustAtt(code){const a=ATT[code];if(!a)return 0;if(pct(a.present,a.total)>=75)return 0;return Math.ceil(Math.max(0,(0.75*a.total-a.present)/0.25));}
+function attDot(code){const a=ATT[code];if(!a||!a.total)return'var(--tx3)';return colVar(a.present,a.total);}
+function attPct(code){const a=ATT[code];if(!a||!a.total)return'—';return pct(a.present,a.total).toFixed(0)+'%';}
 
-/* ── LOGIN ── */
+function isHol(ds){
+  if(BASE_HOL[ds])return true;
+  const d=new Date(ds+'T00:00:00');
+  return d.getDay()===0||d.getDay()===6;
+}
+
+function getSlots(ds){
+  if(isHol(ds)||isExamDay(ds))return[];
+  const dow=new Date(ds+'T00:00:00').getDay();
+  return TT.filter(t=>t.day===dow);
+}
+
+function overallAtt(){
+  let p=0,t=0;
+  SUBJECTS.forEach(s=>{const a=ATT[s.code];if(a){p+=a.present;t+=a.total;}});
+  return{p,t};
+}
+
+function canBunk(code,thr){
+  const a=ATT[code];if(!a)return 0;
+  const x=(a.present-(thr/100)*a.total)/(thr/100);
+  return Math.max(0,Math.floor(x));
+}
+
+function mustAtt(code){
+  const a=ATT[code];if(!a)return 0;
+  if(pct(a.present,a.total)>=75)return 0;
+  return Math.ceil(Math.max(0,(0.75*a.total-a.present)/0.25));
+}
+
+/* ─── EXAM DEADLINE WARNING ─── */
+function getNextExamDeadline(){
+  const td=today();
+  // Sessional-I: attendance cutoff is Aug 14
+  if(td<='2026-08-14')return{name:'Sessional-I',cutoff:'2026-08-14',examStart:SESSIONAL1_START};
+  // Sessional-II: attendance cutoff is Nov 6
+  if(td<='2026-11-06')return{name:'Sessional-II',cutoff:'2026-11-06',examStart:SESSIONAL2_START};
+  return null;
+}
+
+function daysUntil(ds){
+  const now=new Date(today()+'T00:00:00');
+  const target=new Date(ds+'T00:00:00');
+  return Math.round((target-now)/(1000*60*60*24));
+}
+
+function renderExamBanner(){
+  const wrap=document.getElementById('exam-banner-wrap');
+  const deadline=getNextExamDeadline();
+  if(!deadline){wrap.innerHTML='';return;}
+  const days=daysUntil(deadline.cutoff);
+  const {p,t}=overallAtt();
+  const v=pct(p,t);
+  const safe=v>=75;
+  const urgent=days<=7;
+  const totalDays=deadline.name==='Sessional-I'
+    ?daysUntil('2026-06-29')<0?daysUntil('2026-06-29')+Math.abs(daysUntil('2026-06-29'))+49:49
+    :daysUntil('2026-08-29')<0?60:60;
+  // ring: how many days left out of total span
+  const span=deadline.name==='Sessional-I'?49:70;
+  const progress=Math.max(0,Math.min(1,days/span));
+  const r=22;const circ=2*Math.PI*r;
+  const dashOffset=circ*(1-progress);
+  // color theme based on urgency and safety
+  let bgGrad,ringCol,borderCol;
+  if(days<=0){
+    bgGrad='linear-gradient(135deg,#1a0a0a 0%,#2d0f0f 100%)';
+    ringCol='#f04444';borderCol='rgba(240,68,68,.4)';
+  } else if(urgent&&!safe){
+    bgGrad='linear-gradient(135deg,#1a0a0a 0%,#2a1000 50%,#1a0a0a 100%)';
+    ringCol='#f97316';borderCol='rgba(249,115,22,.4)';
+  } else if(urgent&&safe){
+    bgGrad='linear-gradient(135deg,#0a1a0f 0%,#0d2a18 50%,#0a1a0f 100%)';
+    ringCol='#22d473';borderCol='rgba(34,212,115,.35)';
+  } else if(days<=21){
+    bgGrad='linear-gradient(135deg,#12110a 0%,#1e1a08 50%,#12110a 100%)';
+    ringCol='#f5c518';borderCol='rgba(245,197,24,.3)';
+  } else {
+    bgGrad='linear-gradient(135deg,#0d0d18 0%,#131228 50%,#0d0d18 100%)';
+    ringCol='#a78bfa';borderCol='rgba(167,139,250,.3)';
+  }
+  const titleText=days<=0?`Cutoff is TODAY — submit attendance now!`
+    :days===1?`Cutoff tomorrow — check your attendance`
+    :days<=7?`${days} days to ${deadline.name} cutoff`
+    :`${days} days until ${deadline.name} cutoff`;
+  const attPill=t?`${v.toFixed(1)}% overall`:' No data yet';
+  const attPillClass=!t?'':v>=75?'ok':'warn';
+  const examPill=`Exams ${fmtDate(deadline.examStart)}`;
+  const cutoffPill=`Cutoff ${fmtDate(deadline.cutoff)}`;
+  const needPill=safe?'≥75% ✓':'Need ≥75%';
+
+  wrap.innerHTML=`<div class="exam-card${urgent?' urgent':''}" style="border-color:${borderCol}" onclick="tab('estimator')">
+    <div class="exam-card-bg anim" style="background:${bgGrad}"></div>
+    <div class="exam-card-content">
+      <div class="exam-ring-wrap">
+        <svg viewBox="0 0 54 54">
+          <circle class="exam-ring-track" cx="27" cy="27" r="${r}"/>
+          <circle class="exam-ring-fill" cx="27" cy="27" r="${r}"
+            stroke="${ringCol}"
+            stroke-dasharray="${circ.toFixed(2)}"
+            stroke-dashoffset="${dashOffset.toFixed(2)}"/>
+        </svg>
+        <div class="exam-ring-center" style="color:${ringCol}">
+          <div class="exam-ring-days">${Math.max(0,days)}</div>
+          <div class="exam-ring-lbl">days</div>
+        </div>
+      </div>
+      <div class="exam-card-info">
+        <div class="exam-card-name">${deadline.name} · Attendance Cutoff</div>
+        <div class="exam-card-title" style="color:#fff">${titleText}</div>
+        <div class="exam-card-pills">
+          <span class="exam-pill ${attPillClass}">${attPill}</span>
+          <span class="exam-pill">${cutoffPill}</span>
+          <span class="exam-pill">${examPill}</span>
+          <span class="exam-pill ${safe?'ok':'warn'}">${needPill}</span>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ─── LOGIN ─── */
 function resolveProfile(roll){
-  if(roll==='2025669160') return 'r2025669160';
-  if(/^2023\d{6}$/.test(roll)) return 'csbs';
+  if(/^2023\d{6}$/.test(roll))return'csbs';
   return null;
 }
 function loadProfile(roll){
@@ -651,7 +789,6 @@ function doLogin(){
   if(!resolveProfile(roll)){document.getElementById('login-err').style.display='block';return;}
   document.getElementById('login-err').style.display='none';
   currentRoll=roll;
-  // Reset state completely before loading new user's data
   ATT={};LOGS={};semEnd=DEFAULT_SEM_END;
   loadProfile(roll);
   localStorage.setItem('bm_roll',roll);
@@ -661,7 +798,7 @@ function doLogin(){
   initATT();initLogDate();initDB();
 }
 function logout(){
-  if(!confirm('Switch account? You will need to enter your roll number again.'))return;
+  if(!confirm('Switch account?'))return;
   localStorage.removeItem('bm_roll');
   location.reload();
 }
@@ -679,9 +816,10 @@ function checkAutoLogin(){
   }
 }
 
-/* ── DB ── */
-function initATT(){SUBJECTS.forEach(s=>{ATT[s.code]={present:s.p,total:s.t};});}
+/* ─── DB ─── */
+function initATT(){SUBJECTS.forEach(s=>{if(!ATT[s.code])ATT[s.code]={present:0,total:0};});}
 function setSS(st,lbl){document.getElementById('sdot').className='dot '+st;document.getElementById('slbl').textContent=lbl;}
+
 async function initDB(){
   setSS('load','connecting…');
   try{
@@ -693,12 +831,14 @@ async function initDB(){
     } else {
       ATT=data.attendance||{};LOGS=data.logs||{};
       semEnd=data.sem_end||DEFAULT_SEM_END;
-      if(!Object.keys(ATT).length)initATT();
+      // Ensure new subjects exist
+      SUBJECTS.forEach(s=>{if(!ATT[s.code])ATT[s.code]={present:0,total:0};});
     }
     setSS('ok','synced');
   }catch(e){setSS('err','offline');loadLocal();}
   renderAll();initLogDate();initSemSettings();
 }
+
 async function save(){
   if(db){
     try{
@@ -711,46 +851,49 @@ function saveLocal(){try{localStorage.setItem('bm_'+currentRoll,JSON.stringify({
 function loadLocal(){
   try{
     const d=JSON.parse(localStorage.getItem('bm_'+currentRoll)||'null');
-    if(d){ATT=d.ATT||{};LOGS=d.LOGS||{};semEnd=d.semEnd||DEFAULT_SEM_END;if(!Object.keys(ATT).length)initATT();}
+    if(d){
+      ATT=d.ATT||{};LOGS=d.LOGS||{};semEnd=d.semEnd||DEFAULT_SEM_END;
+      SUBJECTS.forEach(s=>{if(!ATT[s.code])ATT[s.code]={present:0,total:0};});
+    }
   }catch(e){initATT();}
 }
 
-/* ── SETTINGS ── */
+/* ─── SETTINGS ─── */
 function initSemSettings(){
   const el=document.getElementById('sem-end-input');
-  el.value=semEnd;el.min=SEM_START;el.max='2026-06-30';
-  // holidays list
+  el.value=semEnd;el.min=SEM_START;el.max='2026-12-31';
   const hols=Object.entries(BASE_HOL).map(([d,n])=>`${fmtDate(d)} – ${n}`).join(' · ');
   document.getElementById('hol-list-disp').textContent=hols+' · (weekends auto)';
-  // update estimator date maxes
-  ['ea-date','eb-date'].forEach(id=>{const el=document.getElementById(id);if(el)el.max=semEnd;});
+  ['ea-date','eb-date'].forEach(id=>{const el=document.getElementById(id);if(el){el.min=SEM_START;el.max=semEnd;}});
 }
 async function saveSemEnd(){
   semEnd=document.getElementById('sem-end-input').value||DEFAULT_SEM_END;
   initSemSettings();renderCal();await save();showToast('Semester end updated','tg');
 }
 async function resetAll(){
-  if(!confirm('Reset all attendance data to default values? This cannot be undone.'))return;
-  initATT();LOGS={};await save();renderAll();showToast('Reset done','tg');
+  if(!confirm('Reset all attendance data to zero? This cannot be undone.'))return;
+  SUBJECTS.forEach(s=>{ATT[s.code]={present:0,total:0};});
+  LOGS={};await save();renderAll();showToast('Reset done','tg');
 }
 
-/* ── RENDER ALL ── */
+/* ─── RENDER ALL ─── */
 function renderAll(){renderOV();renderHist();renderCal();renderTT();renderBulkList();}
 
-/* ── OVERVIEW ── */
+/* ─── OVERVIEW ─── */
 function renderOV(){
   document.getElementById('ov-spin').style.display='none';
   document.getElementById('ov-body').style.display='block';
+  renderExamBanner();
   const{p,t}=overallAtt();const v=pct(p,t);const col=colVar(p,t);
   document.getElementById('ov-hero').innerHTML=`
     <div class="ov-row">
       <div class="ov-top">
         <div>
           <div class="ov-lbl">Overall Attendance</div>
-          <div class="ov-pct mono" style="color:${col}">${v.toFixed(2)}%</div>
+          <div class="ov-pct mono" style="color:${col}">${t?v.toFixed(2)+'%':'No data yet'}</div>
           <div class="ov-sub">${p} present · ${t} total</div>
         </div>
-        <span class="tag" style="background:${col==='var(--g)'?'var(--gbg)':col==='var(--y)'?'var(--ybg)':col==='var(--o)'?'var(--obg)':'var(--rbg)'};color:${col};border:1px solid ${col==='var(--g)'?'var(--gbd)':col==='var(--y)'?'var(--ybd)':col==='var(--o)'?'var(--obd)':'var(--rbd)'};">${v>=80?'Safe ✓':v>=75?'OK':v>=65?'Warning':'Critical'}</span>
+        <span class="tag" style="background:${col==='var(--g)'?'var(--gbg)':col==='var(--y)'?'var(--ybg)':col==='var(--o)'?'var(--obg)':'var(--rbg)'};color:${col};border:1px solid ${col==='var(--g)'?'var(--gbd)':col==='var(--y)'?'var(--ybd)':col==='var(--o)'?'var(--obd)':'var(--rbd)'};">${!t?'New Sem':v>=80?'Safe ✓':v>=75?'OK':v>=65?'Warning':'Critical'}</span>
       </div>
       <div class="ov-bar-wrap">
         <div class="btrack" style="height:8px;position:relative">
@@ -762,25 +905,31 @@ function renderOV(){
         <div class="ov-markers"><span>0%</span><span style="color:var(--r)">65%</span><span style="color:var(--y)">75%</span><span style="color:var(--g)">80%</span><span>100%</span></div>
       </div>
     </div>`;
-  const s80=SUBJECTS.filter(s=>pct(ATT[s.code]?.present||0,ATT[s.code]?.total||1)>=80).length;
-  const s75=SUBJECTS.filter(s=>{const v=pct(ATT[s.code]?.present||0,ATT[s.code]?.total||1);return v>=75&&v<80;}).length;
-  const s65=SUBJECTS.filter(s=>{const v=pct(ATT[s.code]?.present||0,ATT[s.code]?.total||1);return v>=65&&v<75;}).length;
-  const slow=SUBJECTS.filter(s=>pct(ATT[s.code]?.present||0,ATT[s.code]?.total||1)<65).length;
+  const s80=SUBJECTS.filter(s=>ATT[s.code]?.total&&pct(ATT[s.code].present,ATT[s.code].total)>=80).length;
+  const s75=SUBJECTS.filter(s=>{if(!ATT[s.code]?.total)return false;const v=pct(ATT[s.code].present,ATT[s.code].total);return v>=75&&v<80;}).length;
+  const s65=SUBJECTS.filter(s=>{if(!ATT[s.code]?.total)return false;const v=pct(ATT[s.code].present,ATT[s.code].total);return v>=65&&v<75;}).length;
+  const slow=SUBJECTS.filter(s=>ATT[s.code]?.total&&pct(ATT[s.code].present,ATT[s.code].total)<65).length;
   document.getElementById('ov-stats').innerHTML=`
     <div class="sc"><div class="scv" style="color:var(--g)">${s80}</div><div class="scl">≥80%</div></div>
     <div class="sc"><div class="scv" style="color:var(--y)">${s75}</div><div class="scl">75–79%</div></div>
     <div class="sc"><div class="scv" style="color:var(--o)">${s65}</div><div class="scl">65–74%</div></div>
     <div class="sc"><div class="scv" style="color:var(--r)">${slow}</div><div class="scl">&lt;65%</div></div>`;
   document.getElementById('sj-list').innerHTML=SUBJECTS.map(s=>{
-    const a=ATT[s.code]||{present:s.p,total:s.t};
-    const v=pct(a.present,a.total);const col=colVar(a.present,a.total);
+    const a=ATT[s.code]||{present:0,total:0};
+    const v=a.total?pct(a.present,a.total):0;
+    const col=a.total?colVar(a.present,a.total):'var(--tx3)';
     const c75=canBunk(s.code,75),c65=canBunk(s.code,65),must=mustAtt(s.code);
-    const t75=v<75?`<span class="tag tr_">Attend ${must} more → 75%</span>`:c75===0?`<span class="tag to">⚠ 0 safe (75%)</span>`:`<span class="tag ty">Miss ${c75} safe (75%)</span>`;
-    const t65=v<65?`<span class="tag tr_">Below 65%!</span>`:c65===0?`<span class="tag to">⚠ 0 safe (65%)</span>`:`<span class="tag tg">Miss ${c65} safe (65%)</span>`;
+    let t75,t65;
+    if(!a.total){
+      t75=`<span class="tag tp">No data</span>`;t65='';
+    } else {
+      t75=v<75?`<span class="tag tr_">Attend ${must} more → 75%</span>`:c75===0?`<span class="tag to">⚠ 0 safe (75%)</span>`:`<span class="tag ty">Miss ${c75} safe (75%)</span>`;
+      t65=v<65?`<span class="tag tr_">Below 65%!</span>`:c65===0?`<span class="tag to">⚠ 0 safe (65%)</span>`:`<span class="tag tg">Miss ${c65} safe (65%)</span>`;
+    }
     return`<div class="sj">
       <div class="sj-top">
         <div class="sj-meta"><div class="sj-code">${s.code}</div><div class="sj-name">${s.name}</div></div>
-        <div class="sj-r"><div class="sj-pct" style="color:${col}">${v.toFixed(2)}%</div><div class="sj-cnt">${a.present}/${a.total}</div><span class="tag ${s.type==='lab'?'tb_':'tp'}">${s.type}</span></div>
+        <div class="sj-r"><div class="sj-pct" style="color:${col}">${a.total?v.toFixed(2)+'%':'—'}</div><div class="sj-cnt">${a.present}/${a.total}</div><span class="tag ${s.type==='lab'?'tb_':'tp'}">${s.type}</span></div>
       </div>
       <div class="btrack" style="height:3px;margin-bottom:.45rem"><div class="bfill" style="width:${Math.min(v,100)}%;background:${col}"></div></div>
       <div class="sj-bunks">${t75}${t65}</div>
@@ -788,10 +937,9 @@ function renderOV(){
   }).join('');
 }
 
-/* ── ESTIMATOR ── */
+/* ─── ESTIMATOR ─── */
 function setMode(m){
   estMode=m;
-  ['A','B','C'].forEach(x=>document.getElementById('m'+x).classList.toggle('on',m===x.toLowerCase().replace('a','attend').replace('b','bunk').replace('c','cal')));
   document.getElementById('mA').classList.toggle('on',m==='attend');
   document.getElementById('mB').classList.toggle('on',m==='bunk');
   document.getElementById('mC').classList.toggle('on',m==='cal');
@@ -802,10 +950,10 @@ function setMode(m){
   if(m==='cal')renderCalEst();
 }
 
-// Mode A
 function addAttendDate(){
   const ds=document.getElementById('ea-date').value;if(!ds)return;
   if(isHol(ds)){showToast('Holiday — no classes','tr');return;}
+  if(isExamDay(ds)){showToast('Exam period — no attendance','tr');return;}
   if(attendDates.includes(ds)){showToast('Already added','tr');return;}
   if(!getSlots(ds).length){showToast('No classes on that day','tr');return;}
   attendDates.push(ds);attendDates.sort();renderAChips();
@@ -826,10 +974,9 @@ function runAttendAll(){
   showRes(proj,aff,'attend',attendDates,null);
 }
 
-// Mode B
 function refreshBSubjects(){
   const ds=document.getElementById('eb-date').value,sel=document.getElementById('eb-subj');
-  if(!ds||isHol(ds)){sel.innerHTML='<option value="">— pick a valid date first —</option>';return;}
+  if(!ds||isHol(ds)||isExamDay(ds)){sel.innerHTML='<option value="">— pick a valid class day —</option>';return;}
   const slots=getSlots(ds);if(!slots.length){sel.innerHTML='<option value="">No classes on this day</option>';return;}
   const u=[...new Map(slots.map(s=>[s.code,s])).values()];
   sel.innerHTML='<option value="">— pick subject —</option>'+u.map(s=>`<option value="${s.code}">${sname(s.code)}</option>`).join('');
@@ -857,10 +1004,15 @@ function runBunkEst(){
   showRes(proj,aff,'bunk',dates,bset);
 }
 
-// Mode C — Calendar estimator
+// Calendar estimator
 function renderCalEst(){
   const td=today();let html='';
-  [{y:2026,m:1,lbl:'February 2026'},{y:2026,m:2,lbl:'March 2026'},{y:2026,m:3,lbl:'April 2026'}].forEach(({y,m,lbl})=>{
+  const months=[
+    {y:2026,m:5,lbl:'June 2026'},{y:2026,m:6,lbl:'July 2026'},
+    {y:2026,m:7,lbl:'August 2026'},{y:2026,m:8,lbl:'September 2026'},
+    {y:2026,m:9,lbl:'October 2026'},{y:2026,m:10,lbl:'November 2026'}
+  ];
+  months.forEach(({y,m,lbl})=>{
     html+=`<div class="cal-mhdr" style="font-size:.82rem;margin-bottom:.4rem">${lbl}</div><div class="cal-est-grid">`;
     ['S','M','T','W','T','F','S'].forEach(d=>html+=`<div class="ch">${d}</div>`);
     const first=new Date(y,m,1).getDay();const days=new Date(y,m+1,0).getDate();
@@ -868,29 +1020,28 @@ function renderCalEst(){
     for(let d=1;d<=days;d++){
       const ds=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
       if(ds<td||ds>semEnd){html+=`<div class="cec past"><div class="cecn">${d}</div></div>`;continue;}
+      if(ds<SEM_START){html+=`<div class="cec past"><div class="cecn">${d}</div></div>`;continue;}
       const dow=new Date(ds+'T00:00:00').getDay();
-      const wknd=dow===0||dow===6;
-      if(wknd){html+=`<div class="cec wknd"><div class="cecn">${d}</div></div>`;continue;}
-      if(BASE_HOL[ds]){html+=`<div class="cec hol"><div class="cecn">${d}</div><div class="cec-slots">${BASE_HOL[ds].slice(0,4)}</div></div>`;continue;}
+      if(dow===0||dow===6){html+=`<div class="cec wknd"><div class="cecn">${d}</div></div>`;continue;}
+      if(BASE_HOL[ds]){html+=`<div class="cec hol"><div class="cecn">${d}</div><div class="cec-slots">${BASE_HOL[ds].slice(0,5)}</div></div>`;continue;}
+      if(isExamDay(ds)){html+=`<div class="cec exam"><div class="cecn">${d}</div><div class="cec-slots">exam</div></div>`;continue;}
       const slots=getSlots(ds);if(!slots.length){html+=`<div class="cec past"><div class="cecn">${d}</div></div>`;continue;}
       const st=calEstState[ds]||'none';
       let cls='cec';
       if(st==='full')cls+=' sel-full';
       else if(st==='partial')cls+=' sel-partial';
       else if(st==='skip')cls+=' sel-skip';
-      html+=`<div class="${cls}" onclick="toggleCalDay('${ds}')"><div class="cecn">${d}</div><div class="cec-slots">${st==='full'?'✓ attend':st==='partial'?'partial':st==='skip'?'✗ skip':slots.length+'p'}</div></div>`;
+      html+=`<div class="${cls}" onclick="toggleCalDay('${ds}')"><div class="cecn">${d}</div><div class="cec-slots">${st==='full'?'✓':st==='partial'?'part':st==='skip'?'✗ skip':slots.length+'p'}</div></div>`;
     }
     html+=`</div>`;
   });
   document.getElementById('cal-est-body').innerHTML=html;
   renderSkipPickers();
-  const hasSel=Object.keys(calEstState).length>0;
-  document.getElementById('ec-act').style.display=hasSel?'block':'none';
+  document.getElementById('ec-act').style.display=Object.keys(calEstState).filter(k=>!k.includes('_skips')).length>0?'block':'none';
 }
 
 function toggleCalDay(ds){
   const cur=calEstState[ds]||'none';
-  // cycle: none → full attend(purple) → partial skip(yellow) → full skip/absent(red) → none
   if(cur==='none'){calEstState[ds]='full';}
   else if(cur==='full'){calEstState[ds]='partial';if(!calEstState[ds+'_skips'])calEstState[ds+'_skips']=new Set();}
   else if(cur==='partial'){calEstState[ds]='skip';delete calEstState[ds+'_skips'];}
@@ -934,11 +1085,8 @@ function runCalEst(){
     const skips=calEstState[ds+'_skips']||new Set();
     slots.forEach(sl=>{
       proj[sl.code].total++;
-      let isAbsent=false;
-      if(st==='skip') isAbsent=true; // full day absent
-      else if(st==='partial') isAbsent=skips.has(sl.code); // only skipped ones
-      // 'full' = attend all
-      if(!isAbsent) proj[sl.code].present++;
+      let isAbsent=st==='skip'||(st==='partial'&&skips.has(sl.code));
+      if(!isAbsent)proj[sl.code].present++;
       else bset.add(`${ds}|${sl.code}`);
       aff.add(sl.code);
     });
@@ -953,10 +1101,10 @@ function showRes(proj,aff,mode,dates,bset){
   const diff=ov-pct(cp,ct);
   const dtag=Math.abs(diff)<0.01?`<span class="tag tp">No change</span>`:diff>0?`<span class="tag tg">+${diff.toFixed(2)}%</span>`:`<span class="tag tr_">${diff.toFixed(2)}%</span>`;
   const desc=mode==='attend'?`Attending all on ${dates.length} day${dates.length>1?'s':''}`:mode==='cal'?`Calendar plan — ${dates.length} day${dates.length>1?'s':''}`:`Skipping classes across ${dates.length} day${dates.length>1?'s':''}`;
-  let html=`<div class="est-overall"><div><div class="eol-lbl">Projected Overall</div><div class="eol-val mono" style="color:${ocol}">${ov.toFixed(2)}%</div><div class="eol-sub">${desc} · was ${pct(cp,ct).toFixed(2)}%</div></div><div class="eor">${dtag}${ov<65?'<span class="tag tr_">Below 65%!</span>':ov<75?'<span class="tag to">Below 75%</span>':''}</div></div><div class="sec">Affected Subjects</div><div class="esr-list">`;
+  let html=`<div class="est-overall"><div><div class="eol-lbl">Projected Overall</div><div class="eol-val mono" style="color:${ocol}">${tt?ov.toFixed(2)+'%':'—'}</div><div class="eol-sub">${desc} · currently ${ct?pct(cp,ct).toFixed(2)+'%':'no data'}</div></div><div class="eor">${dtag}${ov&&ov<65?'<span class="tag tr_">Below 65%!</span>':ov&&ov<75?'<span class="tag to">Below 75%</span>':''}</div></div><div class="sec">Affected Subjects</div><div class="esr-list">`;
   [...aff].forEach(code=>{
     const a=ATT[code],pr=proj[code];
-    const oldV=pct(a.present,a.total),newV=pct(pr.present,pr.total);
+    const oldV=a.total?pct(a.present,a.total):0,newV=pr.total?pct(pr.present,pr.total):0;
     const col=colVar(pr.present,pr.total);
     const bunked=bset&&[...bset].some(k=>k.endsWith('|'+code));
     const flag=newV<65?`<span class="tag tr_">Below 65%!</span>`:newV<75?`<span class="tag to">Below 75%</span>`:newV>=80?`<span class="tag tg">Safe</span>`:`<span class="tag ty">OK</span>`;
@@ -967,24 +1115,25 @@ function showRes(proj,aff,mode,dates,bset){
   document.getElementById('est-res').scrollIntoView({behavior:'smooth',block:'nearest'});
 }
 
-/* ── LOG ── */
+/* ─── LOG ─── */
 function setLogMode(m){
   logMode=m;
-  ['day','bulk','paste'].forEach(x=>{
-    const b=document.getElementById('lm-'+x);if(b)b.classList.toggle('on',m===x);
-  });
+  ['day','bulk','paste'].forEach(x=>{const b=document.getElementById('lm-'+x);if(b)b.classList.toggle('on',m===x);});
   document.getElementById('log-day-panel').style.display=m==='day'?'block':'none';
   document.getElementById('log-bulk-panel').style.display=m==='bulk'?'block':'none';
   const pp=document.getElementById('log-paste-panel');if(pp)pp.style.display=m==='paste'?'block':'none';
-  if(m==='day' && document.getElementById('log-date').value) loadLog();
+  if(m==='day'&&document.getElementById('log-date').value)loadLog();
 }
-function initLogDate(){const el=document.getElementById('log-date');el.max=today();el.min='2026-01-01';el.value=today();}
+function initLogDate(){const el=document.getElementById('log-date');el.max=today();el.min=SEM_START;el.value=today();}
 function loadLog(){
   const ds=document.getElementById('log-date').value;
   if(!ds){showToast('Pick a date','tr');return;}
   if(ds>today()){showToast('Cannot log future dates','tr');return;}
-  const slots=getSlots(ds);const body=document.getElementById('log-body');
+  if(ds<SEM_START){showToast('Before semester start','tr');return;}
+  const body=document.getElementById('log-body');
+  if(isExamDay(ds)){body.innerHTML=`<div class="card"><div class="empty">📝 Exam period<br>No attendance on ${fmtDate(ds)}</div></div>`;return;}
   if(isHol(ds)){const hn=BASE_HOL[ds]||'Weekend';body.innerHTML=`<div class="card"><div class="empty">🎉 ${hn}<br>No classes today!</div></div>`;return;}
+  const slots=getSlots(ds);
   if(!slots.length){body.innerHTML=`<div class="card"><div class="empty">No classes scheduled</div></div>`;return;}
   const existing=LOGS[ds]||{};logState={};
   slots.forEach((s,i)=>{const key=`${s.code}_${i}`;logState[key]=existing[key]!==undefined?existing[key]:true;});
@@ -1006,7 +1155,7 @@ async function doSaveLog(ds){
 function renderHist(){
   const ul=document.getElementById('log-hist');
   const keys=Object.keys(LOGS).sort((a,b)=>b.localeCompare(a));
-  if(!keys.length){ul.innerHTML='<div class="empty">No logs yet.<br>Start from today!</div>';return;}
+  if(!keys.length){ul.innerHTML='<div class="empty">No logs yet.<br>Semester starts Jun 29!</div>';return;}
   ul.innerHTML=keys.map(ds=>{const log=LOGS[ds];const pres=Object.values(log).filter(Boolean).length;const tot=Object.values(log).length;return`<div class="hist-item"><div><div class="hi-date">${ds} · ${dname(ds)}</div><div class="hi-sum">${pres}/${tot} attended</div></div><div class="hi-acts"><button class="btn btn-s btn-sm" onclick="editLog('${ds}')">Edit</button><button class="btn btn-d btn-sm" onclick="delLog('${ds}')">Del</button></div></div>`;}).join('');
 }
 function editLog(ds){document.getElementById('log-date').value=ds;setLogMode('day');tab('log');loadLog();window.scrollTo(0,0);}
@@ -1017,10 +1166,10 @@ async function delLog(ds){
   delete LOGS[ds];await save();renderOV();renderHist();renderCal();showToast('Deleted','tr');
 }
 
-/* ── BULK LOG ── */
+/* ─── BULK LOG ─── */
 function renderBulkList(){
   document.getElementById('bulk-subj-list').innerHTML=SUBJECTS.map(s=>{
-    const a=ATT[s.code]||{present:s.p,total:s.t};
+    const a=ATT[s.code]||{present:0,total:0};
     return`<div class="bulk-row">
       <div class="bulk-info"><div class="bulk-name">${s.name}</div><div class="bulk-code">${s.code}</div></div>
       <div class="bulk-inputs">
@@ -1039,20 +1188,20 @@ async function saveBulk(){
     if(p>t){valid=false;showToast(`${s.code}: present > total!`,'tr');}
   });
   if(!valid)return;
-  SUBJECTS.forEach(s=>{
-    ATT[s.code]={
-      present:parseInt(document.getElementById('bp_'+s.code).value)||0,
-      total:parseInt(document.getElementById('bt_'+s.code).value)||0
-    };
-  });
+  SUBJECTS.forEach(s=>{ATT[s.code]={present:parseInt(document.getElementById('bp_'+s.code).value)||0,total:parseInt(document.getElementById('bt_'+s.code).value)||0};});
   await save();renderOV();renderTT();showToast('Bulk data saved ✓','tg');
 }
 function resetBulkInputs(){SUBJECTS.forEach(s=>{document.getElementById('bp_'+s.code).value=ATT[s.code]?.present||0;document.getElementById('bt_'+s.code).value=ATT[s.code]?.total||0;});}
 
-/* ── CALENDAR ── */
+/* ─── CALENDAR ─── */
 function renderCal(){
   const td=today();let html='';
-  [{y:2026,m:1,lbl:'February 2026'},{y:2026,m:2,lbl:'March 2026'},{y:2026,m:3,lbl:'April 2026'}].forEach(({y,m,lbl})=>{
+  const months=[
+    {y:2026,m:5,lbl:'June 2026'},{y:2026,m:6,lbl:'July 2026'},
+    {y:2026,m:7,lbl:'August 2026'},{y:2026,m:8,lbl:'September 2026'},
+    {y:2026,m:9,lbl:'October 2026'},{y:2026,m:10,lbl:'November 2026'}
+  ];
+  months.forEach(({y,m,lbl})=>{
     html+=`<div class="cal-mhdr">${lbl}</div><div class="cal-grid">`;
     ['S','M','T','W','T','F','S'].forEach(d=>html+=`<div class="ch">${d}</div>`);
     const first=new Date(y,m,1).getDay();const days=new Date(y,m+1,0).getDate();
@@ -1060,47 +1209,40 @@ function renderCal(){
     for(let d=1;d<=days;d++){
       const ds=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
       const dow=new Date(ds+'T00:00:00').getDay();
-      const wknd=dow===0||dow===6,hol=!!BASE_HOL[ds],logged=!!LOGS[ds],isT=ds===td,past=ds<td,beyond=ds>semEnd;
+      const wknd=dow===0||dow===6;
+      const hol=!!BASE_HOL[ds];
+      const exam=isExamDay(ds);
+      const logged=!!LOGS[ds];
+      const isT=ds===td;
+      const past=ds<td;
+      const before=ds<SEM_START;
+      const beyond=ds>semEnd;
       let cls='cc';
-      if(wknd)cls+=' wknd';else if(hol)cls+=' hol';else if(logged)cls+=' logged';
-      if(isT)cls+=' today';else if(past&&!logged&&!wknd&&!hol&&ds>=SEM_START)cls+=' past';
-      if(beyond&&!isT)cls=cls.replace(' logged','');
+      if(before||beyond)cls+=' past';
+      else if(wknd)cls+=' wknd';
+      else if(hol)cls+=' hol';
+      else if(exam)cls+=' exam';
+      else if(logged)cls+=' logged';
+      if(isT)cls+=' today';
+      else if(past&&!logged&&!wknd&&!hol&&!exam&&ds>=SEM_START&&!beyond)cls+=' past';
       const hname=BASE_HOL[ds]||'';
-      const hshort=hname.length>8?hname.slice(0,7)+'…':hname;
-      const sl=wknd||hol?[]:getSlots(ds);
-      const noDotsZone=ds>='2026-02-02'&&ds<='2026-02-20';
-      const dots=noDotsZone?'':[...new Set(sl.map(s=>s.code))].slice(0,5).map(code=>{
-        const v=pct(ATT[code]?.present||0,ATT[code]?.total||1);
-        const c=v>=80?'var(--g)':v>=75?'var(--y)':v>=65?'var(--o)':'var(--r)';
+      const hshort=hname.length>7?hname.slice(0,6)+'…':hname;
+      const examlbl=exam?(ds>=SESSIONAL1_START&&ds<=SESSIONAL1_END?'S1 Exam':'S2 Exam'):'';
+      const sl=(!wknd&&!hol&&!exam&&!before&&!beyond)?getSlots(ds):[];
+      const dots=[...new Set(sl.map(s=>s.code))].slice(0,5).map(code=>{
+        const a=ATT[code];if(!a||!a.total)return`<span class="cd" style="background:var(--tx3)"></span>`;
+        const v=pct(a.present,a.total);const c=v>=80?'var(--g)':v>=75?'var(--y)':v>=65?'var(--o)':'var(--r)';
         return`<span class="cd" style="background:${c}"></span>`;
       }).join('');
-      html+=`<div class="${cls}"><div class="ccn">${d}</div>${hol?`<div class="cch">${hshort}</div>`:beyond?`<div class="cch" style="color:var(--tx3)">end</div>`:''}<div class="ccd">${dots}</div></div>`;
+      html+=`<div class="${cls}"><div class="ccn">${d}</div>${hol?`<div class="cch">${hshort}</div>`:exam?`<div class="cch">${examlbl}</div>`:before||beyond?`<div class="cch" style="color:var(--tx3)">${beyond?'end':''}</div>`:''}<div class="ccd">${dots}</div></div>`;
     }
     html+=`</div><div class="divider"></div>`;
   });
   document.getElementById('cal-body').innerHTML=html;
 }
 
-/* ── TIMETABLE ── */
+/* ─── TIMETABLE ─── */
 function renderTT(){
-  const days=['Mon','Tue','Wed','Thu','Fri'];
-  let html=`<thead><tr><th class="tt-th" style="min-width:72px;text-align:left;padding-left:.6rem;background:transparent;border-color:transparent;color:var(--tx3);font-size:.6rem">TIME</th>${days.map(d=>`<th class="tt-th">${d}</th>`).join('')}</tr></thead><tbody>`;
-  SLOTS.forEach(slot=>{
-    const [start,end]=SLOT_LBL[slot].split('–');
-    html+=`<tr><td class="tt-time">${start}<br><span style="opacity:.5">–${end}</span></td>`;
-    for(let day=1;day<=5;day++){
-      const s=TT.find(t=>t.day===day&&t.slot===slot);
-      if(!s)html+=`<td class="tt-c nil"><div class="tt-cn">—</div></td>`;
-      else{
-        const sub=SUBJECTS.find(x=>x.code===s.code);
-        const dotCol=attDot(s.code);
-        html+=`<td class="tt-c ${sub?.type||'lecture'}"><div class="tt-cn">${sub?.name||s.code}</div><div class="tt-cc">${s.code}</div><span class="tt-dot" style="background:${dotCol}" title="${attPct(s.code)}"></span></td>`;
-      }
-    }
-    html+='</tr>';
-  });
-  html+='</tbody>';
-  document.getElementById('tt-tbl').innerHTML=html;
   const dayNames=['Monday','Tuesday','Wednesday','Thursday','Friday'];
   let mhtml='';
   for(let day=1;day<=5;day++){
@@ -1117,7 +1259,7 @@ function renderTT(){
   document.getElementById('tt-mobile').innerHTML=mhtml;
 }
 
-/* ── TABS ── */
+/* ─── TABS ─── */
 function tab(id){
   const IDS=['overview','estimator','log','calendar','timetable','settings'];
   document.querySelectorAll('.nb').forEach((b,i)=>b.classList.toggle('on',IDS[i]===id));
@@ -1126,78 +1268,41 @@ function tab(id){
   window.scrollTo(0,0);
 }
 
-/* ── TOAST ── */
+/* ─── TOAST ─── */
 let _tt;
 function showToast(msg,cls=''){const el=document.getElementById('toast');el.textContent=msg;el.className='toast '+cls+' show';clearTimeout(_tt);_tt=setTimeout(()=>el.classList.remove('show'),2400);}
 
-/* ── PORTAL PASTE PARSER ── */
+/* ─── PORTAL PASTE PARSER ─── */
 let parsedPasteData=[];
-
 function parsePaste(){
   const raw=document.getElementById('paste-input').value.trim();
   parsedPasteData=[];
   if(!raw){document.getElementById('paste-preview').innerHTML='';document.getElementById('paste-act').style.display='none';return;}
-
-  // Build code lookup
   const codeMap={};
   SUBJECTS.forEach(s=>{codeMap[s.code.toUpperCase()]=s;});
-
   const rows=[];
-  // Strategy: find subject codes (19ECBxxx, 19EHSxxx etc) then grab next 2-3 numbers after
   const codePattern=/\b((?:19|24)[A-Z0-9]+P?|HSMCH\d+)\b/gi;
   const matches=[...raw.matchAll(codePattern)];
-
   for(const m of matches){
     const code=m[1].toUpperCase();
-    const sub=codeMap[code];
-    if(!sub) continue;
-    // Grab text after this code (up to 120 chars)
-    const after=raw.slice(m.index+m[0].length, m.index+m[0].length+120);
-    // Extract all standalone numbers
+    const sub=codeMap[code];if(!sub)continue;
+    const after=raw.slice(m.index+m[0].length,m.index+m[0].length+120);
     const nums=(after.match(/\b(\d{1,3})\b/g)||[]).map(Number);
-    if(nums.length<2) continue;
-    // Present and total: first two numbers where present <= total
+    if(nums.length<2)continue;
     let present=-1,total=-1;
-    for(let i=0;i<nums.length-1;i++){
-      if(nums[i]<=nums[i+1]&&nums[i+1]>0&&nums[i+1]<=300){
-        present=nums[i];total=nums[i+1];break;
-      }
-    }
-    if(present<0||total<=0) continue;
-    // Avoid duplicates
-    if(!rows.find(r=>r.sub.code===sub.code)) rows.push({sub,present,total});
+    for(let i=0;i<nums.length-1;i++){if(nums[i]<=nums[i+1]&&nums[i+1]>0&&nums[i+1]<=300){present=nums[i];total=nums[i+1];break;}}
+    if(present<0||total<=0)continue;
+    if(!rows.find(r=>r.sub.code===sub.code))rows.push({sub,present,total});
   }
-
   parsedPasteData=rows;
   renderPastePreview();
 }
-
 function renderPastePreview(){
-  const preview=document.getElementById('paste-preview');
-  const act=document.getElementById('paste-act');
-  if(!parsedPasteData.length){
-    preview.innerHTML='<div style="font-size:.75rem;color:var(--r);padding:.5rem 0;margin-top:.4rem">Could not detect attendance data. Make sure you copied directly from the portal attendance table.</div>';
-    act.style.display='none';
-    return;
-  }
+  const preview=document.getElementById('paste-preview');const act=document.getElementById('paste-act');
+  if(!parsedPasteData.length){preview.innerHTML='<div style="font-size:.75rem;color:var(--r);padding:.5rem 0">Could not detect data. Copy directly from the portal attendance table.</div>';act.style.display='none';return;}
   act.style.display='flex';
-  preview.innerHTML=`
-    <div style="font-size:.7rem;font-weight:700;color:var(--g);margin:.6rem 0 .4rem">✓ Detected ${parsedPasteData.length} subjects</div>
-    <div style="display:flex;flex-direction:column;gap:.28rem">
-      ${parsedPasteData.map(r=>{
-        const v=(r.present/r.total*100).toFixed(0);
-        const col=v>=80?'var(--g)':v>=75?'var(--y)':v>=65?'var(--o)':'var(--r)';
-        return`<div style="display:flex;align-items:center;justify-content:space-between;background:var(--s2);border:1px solid var(--bd);border-radius:var(--rad-s);padding:.4rem .65rem;gap:.5rem">
-          <div style="flex:1;min-width:0">
-            <div style="font-family:'JetBrains Mono',monospace;font-size:.56rem;color:var(--tx3)">${r.sub.code}</div>
-            <div style="font-size:.78rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.sub.name}</div>
-          </div>
-          <div style="font-family:'JetBrains Mono',monospace;font-size:.82rem;color:${col};flex-shrink:0">${r.present}/${r.total} · ${v}%</div>
-        </div>`;
-      }).join('')}
-    </div>`;
+  preview.innerHTML=`<div style="font-size:.7rem;font-weight:700;color:var(--g);margin:.6rem 0 .4rem">✓ Detected ${parsedPasteData.length} subjects</div><div style="display:flex;flex-direction:column;gap:.28rem">${parsedPasteData.map(r=>{const v=(r.present/r.total*100).toFixed(0);const col=v>=80?'var(--g)':v>=75?'var(--y)':v>=65?'var(--o)':'var(--r)';return`<div style="display:flex;align-items:center;justify-content:space-between;background:var(--s2);border:1px solid var(--bd);border-radius:var(--rad-s);padding:.4rem .65rem;gap:.5rem"><div style="flex:1;min-width:0"><div style="font-family:'JetBrains Mono',monospace;font-size:.56rem;color:var(--tx3)">${r.sub.code}</div><div style="font-size:.78rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.sub.name}</div></div><div style="font-family:'JetBrains Mono',monospace;font-size:.82rem;color:${col};flex-shrink:0">${r.present}/${r.total} · ${v}%</div></div>`;}).join('')}</div>`;
 }
-
 async function applyPaste(){
   if(!parsedPasteData.length)return;
   parsedPasteData.forEach(r=>{ATT[r.sub.code]={present:r.present,total:r.total};});
@@ -1205,15 +1310,9 @@ async function applyPaste(){
   showToast(`Updated ${parsedPasteData.length} subjects ✓`,'tg');
   clearPaste();setLogMode('day');
 }
+function clearPaste(){document.getElementById('paste-input').value='';document.getElementById('paste-preview').innerHTML='';document.getElementById('paste-act').style.display='none';parsedPasteData=[];}
 
-function clearPaste(){
-  document.getElementById('paste-input').value='';
-  document.getElementById('paste-preview').innerHTML='';
-  document.getElementById('paste-act').style.display='none';
-  parsedPasteData=[];
-}
-
-/* ── THEME ── */
+/* ─── THEME ─── */
 function toggleTheme(){
   const isLight=document.body.classList.toggle('light');
   document.getElementById('theme-btn').textContent=isLight?'☀️':'🌙';
@@ -1225,64 +1324,122 @@ function initTheme(){
   if(saved==='light'){document.body.classList.add('light');document.getElementById('theme-btn').textContent='☀️';document.querySelector('meta[name="theme-color"]').content='#f0f0f5';}
 }
 
-/* ── SWIPE GESTURES ── */
+/* ─── SWIPE GESTURES ─── */
 (function(){
   const TABS=['overview','estimator','log','calendar','timetable','settings'];
   let startX=0,startY=0,startT=0;
-  document.addEventListener('touchstart',e=>{
-    startX=e.touches[0].clientX;
-    startY=e.touches[0].clientY;
-    startT=Date.now();
-  },{passive:true});
+  document.addEventListener('touchstart',e=>{startX=e.touches[0].clientX;startY=e.touches[0].clientY;startT=Date.now();},{passive:true});
   document.addEventListener('touchend',e=>{
-    const dx=e.changedTouches[0].clientX-startX;
-    const dy=e.changedTouches[0].clientY-startY;
-    const dt=Date.now()-startT;
-    // Valid swipe: fast, horizontal, not vertical scroll
+    const dx=e.changedTouches[0].clientX-startX;const dy=e.changedTouches[0].clientY-startY;const dt=Date.now()-startT;
     if(dt>400||Math.abs(dx)<60||Math.abs(dy)>Math.abs(dx)*0.8)return;
-    // Don't swipe if touching input/textarea/select
-    const tag=e.target.tagName;
-    if(tag==='INPUT'||tag==='TEXTAREA'||tag==='SELECT')return;
-    const active=document.querySelector('.pg.on')?.id?.replace('pg-','');
-    const idx=TABS.indexOf(active);
-    if(idx===-1)return;
-    if(dx<0&&idx<TABS.length-1)tab(TABS[idx+1]); // swipe left = next
-    if(dx>0&&idx>0)tab(TABS[idx-1]); // swipe right = prev
+    const tag=e.target.tagName;if(tag==='INPUT'||tag==='TEXTAREA'||tag==='SELECT')return;
+    const active=document.querySelector('.pg.on')?.id?.replace('pg-','');const idx=TABS.indexOf(active);if(idx===-1)return;
+    if(dx<0&&idx<TABS.length-1)tab(TABS[idx+1]);
+    if(dx>0&&idx>0)tab(TABS[idx-1]);
   },{passive:true});
 })();
 
-/* ── PWA INSTALL ── */
+/* ─── PWA ─── */
 let deferredPrompt=null;
 window.addEventListener('beforeinstallprompt',e=>{
   e.preventDefault();deferredPrompt=e;
-  // Show install banner after 3s if not already installed
-  setTimeout(()=>{
-    if(deferredPrompt&&!localStorage.getItem('bm_pwa_dismissed')){
-      showInstallBanner();
-    }
-  },3000);
+  setTimeout(()=>{if(deferredPrompt&&!localStorage.getItem('bm_pwa_dismissed'))showInstallBanner();},3000);
 });
 function showInstallBanner(){
-  const b=document.createElement('div');
-  b.id='pwa-banner';
+  const b=document.createElement('div');b.id='pwa-banner';
   b.style.cssText='position:fixed;bottom:1.2rem;left:50%;transform:translateX(-50%);background:var(--s2);border:1px solid var(--pbd);border-radius:50px;padding:.55rem 1rem;font-size:.76rem;font-weight:600;color:var(--tx);z-index:998;display:flex;align-items:center;gap:.65rem;box-shadow:0 8px 32px rgba(0,0,0,.4);white-space:nowrap';
   b.innerHTML=`<span>📲 Add BunkMeter to home screen</span><button onclick="installPWA()" style="background:var(--p);color:#000;border:none;border-radius:50px;padding:.28rem .75rem;font-family:Outfit,sans-serif;font-weight:700;font-size:.72rem;cursor:pointer">Install</button><button onclick="dismissBanner()" style="background:transparent;border:none;color:var(--tx3);cursor:pointer;font-size:1rem;line-height:1">✕</button>`;
   document.body.appendChild(b);
 }
-function installPWA(){
-  if(!deferredPrompt)return;
-  deferredPrompt.prompt();
-  deferredPrompt.userChoice.then(()=>{deferredPrompt=null;dismissBanner();});
-}
-function dismissBanner(){
-  const b=document.getElementById('pwa-banner');if(b)b.remove();
-  localStorage.setItem('bm_pwa_dismissed','1');
+function installPWA(){if(!deferredPrompt)return;deferredPrompt.prompt();deferredPrompt.userChoice.then(()=>{deferredPrompt=null;dismissBanner();});}
+function dismissBanner(){const b=document.getElementById('pwa-banner');if(b)b.remove();localStorage.setItem('bm_pwa_dismissed','1');}
+
+/* ─── INIT ─── */
+/* ─── PUSH NOTIFICATIONS ─── */
+const VAPID_PUBLIC_KEY='BLkyc5xLiVXhbnBxFhQuG9S36mwUduQGWPDuW4WJnPIj599I0oVwWVE7tZj4exlOLiAYGP4EAoD2F3SegTvtRbk';
+
+function urlBase64ToUint8Array(b){
+  const pad='='.repeat((4-b.length%4)%4);
+  const s=(b+pad).replace(/-/g,'+').replace(/_/g,'/');
+  return Uint8Array.from([...atob(s)].map(c=>c.charCodeAt(0)));
 }
 
-/* ── INIT ── */
-// Register service worker
+async function subscribeToPush(){
+  if(!('serviceWorker' in navigator)||!('PushManager' in window))return;
+  try{
+    const reg=await navigator.serviceWorker.ready;
+    let sub=await reg.pushManager.getSubscription();
+    if(!sub){
+      sub=await reg.pushManager.subscribe({
+        userVisibleOnly:true,
+        applicationServerKey:urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+      });
+    }
+    if(db&&sub){
+      const j=sub.toJSON();
+      await db.from('push_subscriptions').upsert({
+        roll:currentRoll,
+        endpoint:j.endpoint,
+        p256dh:j.keys.p256dh,
+        auth:j.keys.auth,
+        updated_at:new Date().toISOString()
+      },{onConflict:'roll'});
+    }
+    return sub;
+  }catch(e){console.warn('Push subscribe:',e);}
+}
+
+async function requestPushPermission(){
+  if(!('Notification' in window))return showToast('Notifications not supported','tr');
+  if(Notification.permission==='denied')return showToast('Blocked — enable in browser settings','tr');
+  if(Notification.permission==='granted'){
+    await subscribeToPush();showToast('Reminders already on ✓','tg');updateNotifBtn();return;
+  }
+  const perm=await Notification.requestPermission();
+  if(perm==='granted'){
+    await subscribeToPush();showToast('Reminder set for 6:30 PM daily 🔔','tg');updateNotifBtn();
+  } else showToast('Permission denied','tr');
+}
+
+async function disablePush(){
+  try{
+    const reg=await navigator.serviceWorker.ready;
+    const sub=await reg.pushManager.getSubscription();
+    if(sub){await sub.unsubscribe();if(db)await db.from('push_subscriptions').delete().eq('roll',currentRoll);}
+    showToast('Reminders turned off','tg');updateNotifBtn();
+  }catch(e){showToast('Could not disable','tr');}
+}
+
+async function updateNotifBtn(){
+  const btn=document.getElementById('notif-btn');
+  const status=document.getElementById('notif-status');
+  if(!btn)return;
+  if(!('Notification' in window)||!('PushManager' in window)){btn.style.display='none';return;}
+  if(Notification.permission==='granted'){
+    const reg=await navigator.serviceWorker.ready;
+    const sub=await reg.pushManager.getSubscription();
+    if(sub){
+      btn.textContent='Turn Off Reminders';btn.className='btn btn-d btn-sm';btn.onclick=disablePush;
+      if(status)status.textContent='Active — pings you at 6:30 PM every weekday ✓';return;
+    }
+  }
+  if(Notification.permission==='denied'){
+    btn.textContent='Blocked in browser';btn.className='btn btn-s btn-sm';btn.onclick=null;
+    if(status)status.textContent='Go to browser Settings → Notifications to allow';return;
+  }
+  btn.textContent='Enable Daily Reminder';btn.className='btn btn-g btn-sm';btn.onclick=requestPushPermission;
+  if(status)status.textContent='Get nudged at 6:30 PM to log today\'s attendance';
+}
+
+navigator.serviceWorker&&navigator.serviceWorker.addEventListener('message',e=>{
+  if(e.data?.type==='NAVIGATE')tab(e.data.tab||'log');
+});
+
+/* ─── INIT ─── */
 if('serviceWorker' in navigator){
-  window.addEventListener('load',()=>navigator.serviceWorker.register('/sw.js').catch(()=>{}));
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('/sw.js').then(()=>updateNotifBtn()).catch(()=>{});
+  });
 }
 async function init(){initTheme();checkAutoLogin();}
 init();
