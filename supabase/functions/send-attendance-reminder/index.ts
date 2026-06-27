@@ -114,8 +114,8 @@ Deno.serve(async (req) => {
     const payload = JSON.stringify({
       title: "Log Today's Attendance",
       body: tomorrowOff
-        ? `Mark today's classes before you forget! (No classes tomorrow 🎉)`
-        : `Did you attend all classes today? Log it now!`,
+        ? `Mark today's classes before you forget!`
+        : `Mark today's classes before you forget!`,
       url: "/",
       tag: "attendance-reminder",
     });
