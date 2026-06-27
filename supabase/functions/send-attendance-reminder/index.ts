@@ -13,17 +13,79 @@ webpush.setVapidDetails(
   VAPID_PRIVATE_KEY
 );
 
+// ── VSP Campus Holidays ──
+const HOLIDAYS: Record<string, string> = {
+  "2026-08-15": "Independence Day",
+  "2026-09-04": "Srikrishna Janmashtami",
+  "2026-09-14": "Vinayaka Chaturdhi",
+  "2026-10-02": "Gandhi Jayanthi",
+  "2026-10-20": "Vijayadasami",
+  "2026-11-08": "Deepavali",
+};
+
+// ── Exam periods (no classes, no reminder) ──
+const EXAM_PERIODS = [
+  { start: "2026-08-17", end: "2026-08-28", name: "Sessional-I" },
+  { start: "2026-11-09", end: "2026-11-20", name: "Sessional-II" },
+];
+
+// ── Semester bounds ──
+const SEM_START = "2026-06-29";
+const SEM_END   = "2026-11-06";
+
+function toDateStr(d: Date): string {
+  return d.toISOString().slice(0, 10); // "YYYY-MM-DD"
+}
+
+function shouldSkip(force: boolean): { skip: boolean; reason: string } {
+  // Get current IST date (UTC+5:30)
+  const now = new Date();
+  const istOffset = 5.5 * 60 * 60 * 1000;
+  const ist = new Date(now.getTime() + istOffset);
+  const ds = toDateStr(ist);
+  const dow = ist.getUTCDay(); // 0=Sun, 6=Sat
+
+  if (force) return { skip: false, reason: "forced" };
+
+  // Outside semester
+  if (ds < SEM_START || ds > SEM_END) {
+    return { skip: true, reason: `Outside semester (${ds})` };
+  }
+
+  // Weekend
+  if (dow === 0 || dow === 6) {
+    return { skip: true, reason: "Weekend" };
+  }
+
+  // Public holiday
+  if (HOLIDAYS[ds]) {
+    return { skip: true, reason: `Holiday: ${HOLIDAYS[ds]}` };
+  }
+
+  // Exam period
+  for (const period of EXAM_PERIODS) {
+    if (ds >= period.start && ds <= period.end) {
+      return { skip: true, reason: `${period.name} exam period` };
+    }
+  }
+
+  return { skip: false, reason: "class day" };
+}
+
 Deno.serve(async (req) => {
   try {
-    const db = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
-
-    // Skip weekends (unless ?force=true for testing)
     const url = new URL(req.url);
     const force = url.searchParams.get("force") === "true";
-    const day = new Date().getDay();
-    if (!force && (day === 0 || day === 6)) {
-      return new Response(JSON.stringify({ sent: 0, msg: "Weekend — use ?force=true to test" }));
+
+    const { skip, reason } = shouldSkip(force);
+    if (skip) {
+      return new Response(
+        JSON.stringify({ sent: 0, skipped: true, reason }),
+        { headers: { "Content-Type": "application/json" } }
+      );
     }
+
+    const db = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
 
     const { data: subs, error } = await db
       .from("push_subscriptions")
@@ -34,9 +96,26 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ sent: 0, msg: "No subscribers yet" }));
     }
 
+    // Pick message based on context
+    const now = new Date();
+    const istOffset = 5.5 * 60 * 60 * 1000;
+    const ist = new Date(now.getTime() + istOffset);
+    const ds = toDateStr(ist);
+
+    // Check if tomorrow is a holiday/exam/weekend — friendly heads up
+    const tomorrow = new Date(ist);
+    tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
+    const tds = toDateStr(tomorrow);
+    const tomorrowHol = HOLIDAYS[tds];
+    const tomorrowExam = EXAM_PERIODS.find(p => tds >= p.start && tds <= p.end);
+    const tomorrowDow = tomorrow.getUTCDay();
+    const tomorrowOff = tomorrowHol || tomorrowExam || tomorrowDow === 0 || tomorrowDow === 6;
+
     const payload = JSON.stringify({
-      title: "📝 Log Today's Attendance",
-      body: "Don't forget to mark your attendance before you sleep!",
+      title: "Log Today's Attendance",
+      body: tomorrowOff
+        ? `Mark today's classes before you forget! (No classes tomorrow 🎉)`
+        : `Did you attend all classes today? Log it now!`,
       url: "/",
       tag: "attendance-reminder",
     });
@@ -59,22 +138,24 @@ Deno.serve(async (req) => {
         if (e.statusCode === 410 || e.statusCode === 404) {
           stale.push(sub.endpoint);
         }
-        console.error(`Push failed for ${sub.roll}:`, e.statusCode, e.body);
+        console.error(`Push failed for ${sub.roll}:`, e.statusCode);
       }
     }
 
-    // Clean up expired subscriptions
+    // Remove expired subscriptions
     if (stale.length > 0) {
       await db.from("push_subscriptions").delete().in("endpoint", stale);
     }
 
+    console.log(`[${ds}] Sent: ${sent}, Failed: ${failed}, Stale cleaned: ${stale.length}`);
+
     return new Response(
-      JSON.stringify({ sent, failed, stale: stale.length }),
+      JSON.stringify({ sent, failed, stale: stale.length, reason }),
       { headers: { "Content-Type": "application/json" } }
     );
 
   } catch (err) {
-    console.error("Fatal error:", err);
+    console.error("Fatal:", err);
     return new Response(JSON.stringify({ error: String(err) }), { status: 500 });
   }
 });
