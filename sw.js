@@ -35,7 +35,7 @@ self.addEventListener('fetch', e => {
 
 // ── Push received ──
 self.addEventListener('push', e => {
-  let data = { title: '📝 Log Today\'s Attendance', body: 'Tap to open BunkMeter', url: '/' };
+  let data = { title: 'Log Today\'s Attendance', body: 'Tap to open BunkMeter', url: '/' };
   try { data = e.data ? e.data.json() : data; } catch (_) {}
 
   e.waitUntil(
@@ -49,7 +49,7 @@ self.addEventListener('push', e => {
       vibrate: [200, 100, 200],
       data: { url: data.url || '/' },
       actions: [
-        { action: 'log', title: '✅ Log now' },
+        { action: 'log', title: 'Log now' },
         { action: 'dismiss', title: 'Later' },
       ],
     })
