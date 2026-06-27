@@ -17,10 +17,12 @@ Deno.serve(async (req) => {
   try {
     const db = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
 
-    // Skip weekends
+    // Skip weekends (unless ?force=true for testing)
+    const url = new URL(req.url);
+    const force = url.searchParams.get("force") === "true";
     const day = new Date().getDay();
-    if (day === 0 || day === 6) {
-      return new Response(JSON.stringify({ sent: 0, msg: "Weekend" }));
+    if (!force && (day === 0 || day === 6)) {
+      return new Response(JSON.stringify({ sent: 0, msg: "Weekend — use ?force=true to test" }));
     }
 
     const { data: subs, error } = await db
