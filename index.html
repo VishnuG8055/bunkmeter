@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="version" content="1.0.1">
 <title>BunkMeter</title>
 <link rel="icon" type="image/png" sizes="32x32" href="assets/icon.png">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/icon-192.png">
@@ -1437,9 +1438,56 @@ navigator.serviceWorker&&navigator.serviceWorker.addEventListener('message',e=>{
 });
 
 /* ─── INIT ─── */
+/* ─── Auto-Update System ─── */
+let _currentVersion = document.querySelector('meta[name="version"]')?.content || '1.0.0';
+let _hasUpdate = false;
+
+function initAutoUpdate() {
+  if (!('serviceWorker' in navigator)) return;
+  
+  // Store current version
+  localStorage.setItem('bm_version', _currentVersion);
+  
+  // Listen for update messages from service worker
+  if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+    navigator.serviceWorker.addEventListener('message', e => {
+      if (e.data.type === 'UPDATE_VERSION') {
+        const newVersion = e.data.version;
+        if (newVersion && newVersion !== _currentVersion) {
+          _hasUpdate = true;
+          _currentVersion = newVersion;
+          localStorage.setItem('bm_version', newVersion);
+          // Auto-reload silently on next page load
+          console.log('📦 App updated. New version will load on next page open.');
+        }
+      }
+    });
+  }
+  
+  // Auto-reload if update was detected
+  if (localStorage.getItem('bm_version_reload')) {
+    localStorage.removeItem('bm_version_reload');
+    location.reload();
+  }
+}
+
 if('serviceWorker' in navigator){
-  window.addEventListener('load',()=>{
-    navigator.serviceWorker.register('/sw.js').then(()=>updateNotifBtn()).catch(()=>{});
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js', { scope: '/' }).then(reg => {
+      updateNotifBtn();
+      
+      // Check for updates on page load
+      reg.update().catch(() => {});
+      
+      // Check for updates every time the app comes to foreground
+      document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) {
+          reg.update().catch(() => {});
+        }
+      });
+      
+      initAutoUpdate();
+    }).catch(() => {});
   });
 }
 async function init(){initTheme();checkAutoLogin();}
